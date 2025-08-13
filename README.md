@@ -36,7 +36,7 @@ PhysHlth > 10 days → 1, else 0
 
 ## ML Model Used
 
-- Algorithm: TabPFN (Tabular Prior-data Fitted Network)
+- TabPFN (Tabular Prior-data Fitted Network)
 
 - Accuracy: Approx. 85% (can vary depending on dataset and preprocessing)
 
