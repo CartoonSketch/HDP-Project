@@ -34,7 +34,7 @@ Age > 50 → 1, else 0
 BMI > 30 → 1, else 0
 PhysHlth > 10 days → 1, else 0
 
-## ML Model Used
+## Machine Learning (ML) Model Used
 
 - TabPFN (Tabular Prior-data Fitted Network)
 
