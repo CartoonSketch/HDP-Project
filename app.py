@@ -4,36 +4,28 @@ import numpy as np
 
 app = Flask(__name__)
 
-# -----------------------------
 # Load the trained TabPFN model
-# -----------------------------
 with open('heart_disease_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
 # Ensure TabPFN uses GPU if available
 model.device = 'cuda'
 
-# -----------------------------
 # Landing page
-# -----------------------------
 @app.route('/')
 def index():
     return render_template('index.html')
 
-# -----------------------------
-# Prediction form page
-# -----------------------------
+# Prediction page
 @app.route('/predict')
 def predict():
     return render_template('predict.html')
 
-# -----------------------------
 # Handle prediction
-# -----------------------------
 @app.route('/result', methods=['POST'])
 def result():
     try:
-        # Extract 19 features from the form
+        # Extract 19 features from the list
         features = [
             float(request.form.get('HighBP')),
             float(request.form.get('HighChol')),
@@ -65,7 +57,7 @@ def result():
         # Convert prediction to user-friendly text
         pred_text = "High Risk of Heart Disease" if prediction == 1 else "Low Risk of Heart Disease"
 
-        # Optional: Display model accuracy (from training script)
+        # Display model accuracy (from trained model)
         model_accuracy = 0.85  # Example: 85%
 
         return render_template(
@@ -78,8 +70,6 @@ def result():
     except Exception as e:
         return f"Error: {str(e)}"
 
-# -----------------------------
 # Run Flask app
-# -----------------------------
 if __name__ == '__main__':
     app.run(debug=True)
