@@ -59,7 +59,7 @@ This project is licensed under the MIT License.
 
 Arnav Sharma (Team Lead)
 
-Akash Pandit (Team Co Lead)
+Akash Kumar Pandit (Team Co Lead)
 
 Sanjay Reddy 
 
