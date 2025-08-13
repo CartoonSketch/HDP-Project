@@ -6,7 +6,7 @@ import pickle
 # -----------------------------
 # 1. Load the dataset
 # -----------------------------
-df = pd.read_csv('data/heart_data.csv')
+df = pd.read_csv('data/HEART_DISEASE_PREDICTION_DATASET.csv')
 
 # -----------------------------
 # 2. Optional: Sample dataset for TabPFN efficiency
