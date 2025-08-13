@@ -10,6 +10,9 @@ app = Flask(__name__)
 with open('heart_disease_model.pkl', 'rb') as f:
     model = pickle.load(f)
 
+# Ensure TabPFN uses GPU if available
+model.device = 'cuda'
+
 # -----------------------------
 # Landing page
 # -----------------------------
@@ -60,13 +63,9 @@ def result():
         probability = model.predict_proba(features_array)[0][1] * 100  # % chance of heart disease
 
         # Convert prediction to user-friendly text
-        if prediction == 1:
-            pred_text = "High Risk of Heart Disease"
-        else:
-            pred_text = "Low Risk of Heart Disease"
+        pred_text = "High Risk of Heart Disease" if prediction == 1 else "Low Risk of Heart Disease"
 
         # Optional: Display model accuracy (from training script)
-        # You can hardcode the accuracy here or compute dynamically if saved
         model_accuracy = 0.85  # Example: 85%
 
         return render_template(
