@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Enter Your Health Details</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 50px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 800px;
+            margin: auto;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #e63946;
+            text-align: center;
+        }
+        form {
+            margin-top: 30px;
+        }
+        label {
+            display: block;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #333333;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        .btn {
+            background-color: #e63946;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #d62828;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Enter Your Health Information</h1>
+        <form method="POST" action="{{ url_for('result') }}">
+            <!-- 1. High Blood Pressure -->
+            <label>Do you have high blood pressure?</label>
+            <select name="HighBP" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 2. High Cholesterol -->
+            <label>Do you have high cholesterol?</label>
+            <select name="HighChol" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 3. Cholesterol Checked -->
+            <label>Have you ever had your cholesterol checked?</label>
+            <select name="CholCheck" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 4. BMI > 30 -->
+            <label>Is your BMI above 30 (obese)?</label>
+            <select name="BMI" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 5. Smoker -->
+            <label>Do you smoke?</label>
+            <select name="Smoker" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 6. Stroke History -->
+            <label>Have you ever had a stroke?</label>
+            <select name="Stroke" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 7. Diabetes -->
+            <label>Do you have diabetes?</label>
+            <select name="Diabetes" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 8. Physically Active -->
+            <label>Do you do regular physical activity?</label>
+            <select name="PhysActivity" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 9. Eat Fruits Regularly -->
+            <label>Do you eat fruits regularly?</label>
+            <select name="Fruits" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 10. Eat Vegetables Regularly -->
+            <label>Do you eat vegetables regularly?</label>
+            <select name="Veggies" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 11. Heavy Alcohol Consumption -->
+            <label>Do you consume a lot of alcohol?</label>
+            <select name="HvyAlcoholConsump" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 12. Healthcare Coverage -->
+            <label>Do you have any healthcare coverage?</label>
+            <select name="AnyHealthcare" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 13. Skipped Doctor Visits Due to Cost -->
+            <label>Have you ever skipped doctor visits because of cost?</label>
+            <select name="NoDocbcCost" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 14. General Health (Fair/Poor vs Good/Excellent) -->
+            <label>How would you rate your general health?</label>
+            <select name="GenHlth" required>
+                <option value="0">Excellent/Good</option>
+                <option value="1">Fair/Poor</option>
+            </select>
+
+            <!-- 15. Physical Health (Days Not Good) -->
+            <label>In the past month, how many days was your physical health not good? (10+ days = Yes)</label>
+            <select name="PhysHlth" required>
+                <option value="1">10+ days</option>
+                <option value="0">Less than 10 days</option>
+            </select>
+
+            <!-- 16. Difficulty Walking -->
+            <label>Do you have difficulty walking?</label>
+            <select name="DiffWalk" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 17. Sex -->
+            <label>Are you male?</label>
+            <select name="Sex" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- 18. Age > 50 -->
+            <label>Are you older than 50?</label>
+            <select name="Age" required>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <!-- Submit button -->
+            <button type="submit" class="btn">Predict My Risk</button>
+        </form>
+    </div>
+</body>
+  </html>
