@@ -15,7 +15,7 @@
             background-color: #ffffff;
             border-radius: 10px;
             padding: 40px;
-            max-width: 600px;
+            max-width: 700px;
             margin: auto;
             box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
         }
@@ -39,6 +39,38 @@
         .btn:hover {
             background-color: #d62828;
         }
+        /* Team Section */
+        .team {
+            margin-top: 40px;
+        }
+        .team h2 {
+            color: #e63946;
+            margin-bottom: 20px;
+        }
+        .team-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+        }
+        .team-card {
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            padding: 15px 20px;
+            width: 200px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .team-card h3 {
+            margin: 10px 0 5px 0;
+            color: #e63946;
+            font-size: 18px;
+        }
+        .team-card p {
+            margin: 0;
+            font-size: 14px;
+            color: #555555;
+        }
     </style>
 </head>
 <body>
@@ -48,6 +80,37 @@
         <a href="{{ url_for('predict') }}">
             <button class="btn">Let's Predict</button>
         </a>
+
+        <!-- Team Members Section -->
+        <div class="team">
+            <h2>Group 81 Members:</h2>
+            <div class="team-cards">
+                <div class="team-card">
+                    <h3>Arnav Sharma</h3>
+                    <p>Team Lead</p>
+                </div>
+                <div class="team-card">
+                    <h3>Akash Pandit</h3>
+                    <p>Team Co-Lead</p>
+                </div>
+                <div class="team-card">
+                    <h3>Ganta Sanjay Reddy</h3>
+                    <p>Member</p>
+                </div>
+                <div class="team-card">
+                    <h3>Abhishek Mishra</h3>
+                    <p>Member</p>
+                </div>
+                <div class="team-card">
+                    <h3>Shaurya Shukla</h3>
+                    <p>Member</p>
+                </div>
+                <div class="team-card">
+                    <h3>Atharv Gupta</h3>
+                    <p>Member</p>
+                </div>
+            </div>
+        </div>
     </div>
 </body>
 </html>
