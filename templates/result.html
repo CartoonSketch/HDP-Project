@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            padding: 50px;
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 40px;
+            max-width: 700px;
+            margin: auto;
+            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 {
+            color: #e63946;
+        }
+        h2 {
+            margin-top: 30px;
+            color: #1d3557;
+        }
+        p {
+            font-size: 18px;
+            color: #333333;
+            margin-top: 10px;
+        }
+        .btn {
+            background-color: #e63946;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        .btn:hover {
+            background-color: #d62828;
+        }
+        .summary {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #555555;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Your Heart Disease Prediction</h1>
+
+        <h2>{{ prediction }}</h2>
+        <p>Chance of heart disease: <strong>{{ probability }}%</strong></p>
+        <p class="summary">Model accuracy on test data: <strong>{{ accuracy }}%</strong></p>
+
+        <a href="{{ url_for('predict') }}">
+            <button class="btn">Predict Again</button>
+        </a>
+    </div>
+</body>
+</html>
