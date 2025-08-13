@@ -6,7 +6,7 @@ The Heart Disease AI Predictor is a machine learning-based web application built
 Users can provide their health information through a **user-friendly web form**, and the application will return a **risk prediction** along with the **probability percentage** and **model accuracy**.
 
 ## Features
-- Predicts heart disease risk using a trained **TabPFN ML Model**
+- Predicts heart disease risk using a trained **TabPFN (Tabular Prior-data Fitted Network) Model**
 - User-friendly web interface with **19 health-related questions**
 - Displays prediction, probability (% chance), and model accuracy
 - Fully professional and clean design
@@ -36,7 +36,7 @@ PhysHlth > 10 days → 1, else 0
 
 ## ML Model Used
 
-- Algorithm: TabPFN
+- Algorithm: TabPFN (Tabular Prior-data Fitted Network)
 
 - Accuracy: Approx. 85% (can vary depending on dataset and preprocessing)
 
