@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score, classification_report, confusion_mat
 import pickle
 
 # 1. Load dataset
-data = pd.read_csv("data/heart_data.csv")
+data = pd.read_csv("data/HEART_DISEASE_PREDICTION_DATASET.csv")
 
 # 2. Inspect dataset (optional, for debugging)
 print("Columns in dataset:", data.columns)
