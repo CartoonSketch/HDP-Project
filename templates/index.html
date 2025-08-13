@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Heart Disease AI Predictor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Heart Disease AI Predictor</h1>
+        <p>Welcome! This is a machine learning-based application that predicts your risk of heart disease based on your health information.</p>
+        <a href="{{ url_for('predict') }}">
+            <button class="btn">Let's Predict</button>
+        </a>
+    </div>
+</body>
+</html>
