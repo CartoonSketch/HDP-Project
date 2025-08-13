@@ -36,7 +36,7 @@ PhysHlth > 10 days → 1, else 0
 
 ## ML Model Used
 
-- Algorithm: Random Forest Classifier
+- Algorithm: TabPFN
 
 - Accuracy: Approx. 85% (can vary depending on dataset and preprocessing)
 
