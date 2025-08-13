@@ -58,8 +58,13 @@ This project is licensed under the MIT License.
 ## Contributors
 
 Arnav Sharma (Team Lead)
+
 Akash Pandit (Team Co Lead)
+
 Sanjay Reddy 
+
 Atharv Gupta 
+
 Abhishek Mishra
+
 Shaurya Shukla
