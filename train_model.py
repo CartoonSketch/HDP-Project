@@ -32,7 +32,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 # 5. Initialize TabPFN
 # -----------------------------
 # device='cpu' for CPU usage, can use 'cuda' if GPU available
-model = TabPFNClassifier(device='cpu', n_ensemble_configs=32)
+model = TabPFNClassifier(device='cpu')
 
 # -----------------------------
 # 6. Train the model
