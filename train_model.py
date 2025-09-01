@@ -38,7 +38,7 @@ model = TabPFNClassifier(device='cpu')
 # 6. Train the model
 # -----------------------------
 print("Training TabPFN model... This may take several minutes.")
-model.fit(X_train.values, y_train.values)
+model.fit(X_train.values, y_train.values, ignore_pretraining_limits=True)
 
 # -----------------------------
 # 7. Evaluate accuracy
