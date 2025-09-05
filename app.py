@@ -8,7 +8,7 @@ from tabpfn_client import TabPFNClient
 
 app = Flask(__name__)
 
-# Features used in dataset
+# Features used in dataset (must match train_model.py exactly)
 FEATURES = [
     "HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", "Diabetes",
     "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare",
@@ -39,14 +39,20 @@ SUGGESTIONS = {
 # Ensure user plot folder exists
 os.makedirs("static/images/user", exist_ok=True)
 
-# Load model (TabPFNClient)
+# Load model (TabPFNClient object)
 MODEL_PATH = "heart_disease_model.pkl"
+model = None
 if os.path.exists(MODEL_PATH):
-    with open(MODEL_PATH, "rb") as f:
-        model = pickle.load(f)
+    try:
+        with open(MODEL_PATH, "rb") as f:
+            model = pickle.load(f)
+        print("✅ Model loaded successfully.")
+    except Exception as e:
+        print("⚠️ Could not load model.pkl:", e)
+        model = TabPFNClient()  # fallback client
 else:
-    model = TabPFNClient()  # create a fresh client if not trained
-    print("⚠️ No model.pkl found, using a new TabPFNClient (make sure to train first).")
+    print("⚠️ No model.pkl found. Using a new TabPFNClient (please train first).")
+    model = TabPFNClient()
 
 @app.route("/")
 def index():
@@ -55,57 +61,64 @@ def index():
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     if request.method == "POST":
-        # Get user inputs
+        # Get user inputs safely
         user_data = []
         for feature in FEATURES:
             value = request.form.get(feature)
             try:
                 user_data.append(float(value))
-            except:
+            except (ValueError, TypeError):
                 user_data.append(0.0)
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        # Prediction (remote API call)
+        # Prediction (remote API call to TabPFN)
+        prob = 0.0
         try:
-            prob = model.predict_proba(input_df)[0][1] * 100
+            proba = model.predict_proba(input_df)
+            if proba is not None and len(proba[0]) > 1:
+                prob = proba[0][1] * 100
         except Exception as e:
             print("❌ Prediction error:", e)
-            prob = 0.0
 
-        prediction = "High Risk" if prob >= 60 else "Medium Risk" if prob >= 30 else "Low Risk"
+        prediction = (
+            "High Risk" if prob >= 60
+            else "Medium Risk" if prob >= 30
+            else "Low Risk"
+        )
 
         # Save Pie Chart
         labels = ["No Risk", "Heart Disease Risk"]
         values = [100 - prob, prob]
         plt.figure(figsize=(5,5))
-        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, colors=["#4CAF50","#E63946"])
+        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, 
+                colors=["#4CAF50","#E63946"])
         plt.title("Risk Probability")
         pie_path = "static/images/user/pie_chart.png"
         plt.savefig(pie_path)
         plt.close()
 
-        # Save Bar Chart (showing risky inputs only)
+        # Save Bar Chart (showing non-zero inputs only)
         user_features = dict(zip(FEATURES, user_data))
-        risky_features = {f: v for f,v in user_features.items() if v > 0}
-        plt.figure(figsize=(8,5))
-        plt.bar(risky_features.keys(), risky_features.values(), color="orange")
-        plt.title("User Health Factors (Non-zero values)")
-        plt.xticks(rotation=45, ha="right")
-        bar_path = "static/images/user/bar_chart.png"
-        plt.savefig(bar_path)
-        plt.close()
+        risky_features = {f: v for f, v in user_features.items() if v > 0}
+        if risky_features:  # avoid empty chart crash
+            plt.figure(figsize=(8,5))
+            plt.bar(risky_features.keys(), risky_features.values(), color="orange")
+            plt.title("User Health Factors (Non-zero values)")
+            plt.xticks(rotation=45, ha="right")
+            bar_path = "static/images/user/bar_chart.png"
+            plt.savefig(bar_path)
+            plt.close()
+        else:
+            bar_path = None
 
         # Collect Suggestions
-        feedback = []
-        for f, v in risky_features.items():
-            if f in SUGGESTIONS:
-                feedback.append(SUGGESTIONS[f])
+        feedback = [SUGGESTIONS[f] for f in risky_features if f in SUGGESTIONS]
 
         return render_template(
             "result.html",
             prediction=prediction,
-            probability=round(prob,2),
+            probability=round(prob, 2),
             inputs=user_features,
             pie_chart=pie_path,
             bar_chart=bar_path,
