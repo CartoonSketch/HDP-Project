@@ -39,15 +39,15 @@ PhysHlth > 10 days → 1, else 0
 
 - Accuracy: Approx. 85% (can vary depending on dataset and preprocessing)
 
-- Saved Model: heart_disease_model.pkl used by Flask app for predictions
-
 ## Technologies Used
 
-- Python 3.8+
+- Python
 - Flask
 - scikit-learn
 - pandas
 - numpy
+- matplotlib
+- tabpfn-client
 - HTML/CSS
 
 ## License
@@ -60,10 +60,10 @@ Arnav Sharma (Team Lead)
 
 Akash Kumar Pandit (Team Co Lead)
 
-Sanjay Reddy 
+Sanjay Reddy (Member)
 
-Atharv Gupta 
+Atharv Gupta (Member)
 
-Abhishek Mishra
+Abhishek Mishra (Member)
 
-Shaurya Shukla
+Shaurya Shukla (Member)
