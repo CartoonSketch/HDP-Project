@@ -10,9 +10,7 @@ from tabpfn_client import TabPFNClassifier
 import os, json
 
 def train_model():
-    # ================================
     # Load Dataset
-    # ================================
     df = pd.read_csv("data/HEART_DISEASE_PREDICTION_DATASET.csv")
 
     X = df.drop("HeartDiseaseorAttack", axis=1)
@@ -23,12 +21,10 @@ def train_model():
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
-    # ================================
     # Train TabPFN Model via API
-    # ================================
-    model = TabPFNClassifier()   # ✅ use classifier, not client
+    model = TabPFNClassifier()   
 
-    print("🚀 Sending data to TabPFN remote API for training...")
+    print("Sending dataset to TabPFN API for training...")
     model.fit(X_train, y_train)
 
     # Predictions
@@ -37,11 +33,9 @@ def train_model():
 
     # Accuracy
     accuracy = (y_pred == y_test).mean()
-    print(f"✅ Model Accuracy on test data: {accuracy:.2f}")
+    print(f"✅ Model Accuracy on trained data: {accuracy:.2f}")
 
-    # ================================
-    # Save metadata
-    # ================================
+    # Save trained dataset as JSON
     MODEL_META = {
         "features": list(X.columns),
         "accuracy": float(accuracy)
@@ -50,17 +44,13 @@ def train_model():
     with open("model/heart_disease_model_meta.json", "w") as f:
         json.dump(MODEL_META, f, indent=4)
 
-    print("💾 Model metadata saved as 'model/heart_disease_model_meta.json'")
+    print("💾 Trained dataset saved as 'model/heart_disease_model_meta.json'")
     print("   (Model is not pickled – app.py will instantiate TabPFNClassifier fresh and use API.)")
 
-    # ================================
     # Create directory for plots
-    # ================================
     os.makedirs("static/images/analysis", exist_ok=True)
 
-    # ================================
     # Confusion Matrix
-    # ================================
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6,5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
@@ -72,9 +62,7 @@ def train_model():
     plt.savefig("static/images/analysis/confusion_matrix.png")
     plt.close()
 
-    # ================================
     # ROC Curve
-    # ================================
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_auc = auc(fpr, tpr)
     plt.figure(figsize=(6,5))
@@ -87,9 +75,7 @@ def train_model():
     plt.savefig("static/images/analysis/roc_curve.png")
     plt.close()
 
-    # ================================
     # PCA Visualization
-    # ================================
     scaler = StandardScaler()
     X_scaled = scaler.fit_transform(X)
 
@@ -104,9 +90,7 @@ def train_model():
     plt.savefig("static/images/analysis/pca_plot.png")
     plt.close()
 
-    # ================================
     # Density Plots of Features
-    # ================================
     for col in X.columns:
         plt.figure(figsize=(6,4))
         sns.kdeplot(data=df, x=col, hue="HeartDiseaseorAttack", fill=True, common_norm=False, palette="Set1", alpha=0.6)
@@ -114,9 +98,7 @@ def train_model():
         plt.savefig(f"static/images/analysis/density_{col}.png")
         plt.close()
 
-    # ================================
-    # Scatter Plots of Features (vs Age)
-    # ================================
+    # Scatter Plots of Features 
     if "Age" in X.columns:
         for col in X.columns:
             if col != "Age":
@@ -126,10 +108,10 @@ def train_model():
                 plt.savefig(f"static/images/analysis/scatter_Age_{col}.png")
                 plt.close()
 
-    print("📊 All global analysis plots saved in static/images/analysis/")
+    print("📊 All plot/graph analysis saved in static/images/analysis/")
 
     return model, MODEL_META
 
-# Only run training if called directly (optional)
+# Only run training if called directly 
 if __name__ == "__main__":
     train_model()
