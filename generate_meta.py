@@ -8,7 +8,7 @@ from sklearn.metrics import accuracy_score
 # ==========================
 # Paths
 # ==========================
-DATA_PATH = "data/your_dataset.csv"  # change to your CSV file name
+DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv" 
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
 
 # ==========================
