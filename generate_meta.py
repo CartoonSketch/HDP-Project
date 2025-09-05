@@ -19,7 +19,7 @@ FEATURES = [
     "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare",
     "NoDocbcCost", "GenHlth", "PhysHlth", "DiffWalk", "Sex", "Age"
 ]
-TARGET = "HeartDisease"  # Replace with the column name of your target
+TARGET = "HeartDiseaseorAttack"  
 
 # ==========================
 # Load dataset
