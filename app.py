@@ -1,10 +1,10 @@
 from flask import Flask, render_template, request
 import pandas as pd
 import numpy as np
-import pickle
 import os
 import matplotlib.pyplot as plt
-from tabpfn_client import TabPFNClient
+from tabpfn_client import TabPFNClassifier   # ✅ Correct import
+import json
 
 app = Flask(__name__)
 
@@ -39,20 +39,20 @@ SUGGESTIONS = {
 # Ensure user plot folder exists
 os.makedirs("static/images/user", exist_ok=True)
 
-# Load model (TabPFNClient object)
-MODEL_PATH = "heart_disease_model.pkl"
-model = None
-if os.path.exists(MODEL_PATH):
-    try:
-        with open(MODEL_PATH, "rb") as f:
-            model = pickle.load(f)
-        print("✅ Model loaded successfully.")
-    except Exception as e:
-        print("⚠️ Could not load model.pkl:", e)
-        model = TabPFNClient()  # fallback client
+# ================================
+# Load metadata instead of pickled model
+# ================================
+MODEL_META_PATH = "model/heart_disease_model_meta.json"
+if os.path.exists(MODEL_META_PATH):
+    with open(MODEL_META_PATH, "r") as f:
+        MODEL_META = json.load(f)
+    print("✅ Model metadata loaded successfully:", MODEL_META)
 else:
-    print("⚠️ No model.pkl found. Using a new TabPFNClient (please train first).")
-    model = TabPFNClient()
+    MODEL_META = {"features": FEATURES, "accuracy": None}
+    print("⚠️ No metadata found. Please run train_model.py first.")
+
+# Always create a fresh classifier (connects to API)
+model = TabPFNClassifier()
 
 @app.route("/")
 def index():
@@ -122,7 +122,8 @@ def predict():
             inputs=user_features,
             pie_chart=pie_path,
             bar_chart=bar_path,
-            feedback=feedback
+            feedback=feedback,
+            model_accuracy=MODEL_META.get("accuracy")
         )
 
     return render_template("predict.html", features=FEATURES)
