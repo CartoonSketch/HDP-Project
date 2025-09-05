@@ -91,7 +91,7 @@
         </div>
         
         {% if model_accuracy %}
-            <p>Model Accuracy (Global Test Data): <b>{{ model_accuracy*100 | round(2) }}%</b></p>
+            <p>Model Accuracy: <b>{{ model_accuracy*100 | round(2) }}%</b></p>
         {% endif %}
     </div>
 
@@ -130,7 +130,7 @@
     {% endfor %}
     {% endif %}
 
-    <h2>Model Analysis (Global Results)</h2>
+    <h2>Model Analysis</h2>
     <div class="analysis-charts">
         <div>
             <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" alt="Confusion Matrix">
