@@ -10,7 +10,7 @@ Users can provide their health information through a **user-friendly web form**,
 - Displays prediction, probability (% chance), and model accuracy
 - Fully professional and clean design
 
-## Usage
+## Workflow
 
 1. Landing Page → Click “Let's Predict”
 
@@ -58,12 +58,12 @@ This project is licensed under the MIT License.
 
 Arnav Sharma (Team Lead)
 
-Akash Kumar Pandit (Team Co Lead)
+Akash Pandit (Team Co Lead)
 
-Sanjay Reddy (Member)
+Sanjay Reddy (Team Member)
 
-Atharv Gupta (Member)
+Atharv Gupta (Team Member)
 
-Abhishek Mishra (Member)
+Abhishek Mishra (Team Member)
 
-Shaurya Shukla (Member)
+Shaurya Shukla (Team Member)
