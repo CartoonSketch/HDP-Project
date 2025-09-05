@@ -2,115 +2,149 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Heart Disease AI Predictor</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f2f2f2;
-            text-align: center;
-            padding: 50px;
+            background-color: #f7f9fc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
-        .container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 40px;
-            max-width: 700px;
-            margin: auto;
-            box-shadow: 0px 0px 15px rgba(0,0,0,0.2);
-        }
-        h1 {
-            color: #e63946;
-        }
-        p {
-            font-size: 18px;
-            color: #333333;
-        }
-        .btn {
-            background-color: #e63946;
+        .hero {
+            background: linear-gradient(rgba(230, 57, 70, 0.85), rgba(230, 57, 70, 0.85)),
+                        url("https://images.unsplash.com/photo-1588776814546-ec7bdc3f85aa?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80");
+            background-size: cover;
+            background-position: center;
             color: white;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
+            text-align: center;
+            padding: 120px 20px;
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+        .hero p {
+            font-size: 1.2rem;
+            margin-top: 15px;
+        }
+        .btn-start {
+            margin-top: 30px;
+            background-color: #fff;
+            color: #e63946;
+            font-weight: bold;
+            border-radius: 8px;
+            padding: 15px 40px;
             font-size: 18px;
-            cursor: pointer;
-            margin-top: 20px;
         }
-        .btn:hover {
-            background-color: #d62828;
+        .btn-start:hover {
+            background-color: #f1f1f1;
+            color: #d62828;
         }
-        /* Team Section */
-        .team {
-            margin-top: 40px;
+        .section {
+            padding: 60px 20px;
         }
-        .team h2 {
+        .section h2 {
             color: #e63946;
             margin-bottom: 20px;
-        }
-        .team-cards {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
+            text-align: center;
+            font-weight: bold;
         }
         .team-card {
-            background-color: #f9f9f9;
-            border-radius: 10px;
-            padding: 15px 20px;
-            width: 200px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+            padding: 20px;
+            transition: transform 0.3s;
+            background-color: #fff;
             text-align: center;
         }
-        .team-card h3 {
-            margin: 10px 0 5px 0;
-            color: #e63946;
-            font-size: 18px;
+        .team-card:hover {
+            transform: translateY(-8px);
         }
-        .team-card p {
-            margin: 0;
-            font-size: 14px;
-            color: #555555;
+        .team-card h5 {
+            color: #333;
+            margin-top: 15px;
+        }
+        .footer {
+            background-color: #e63946;
+            color: white;
+            text-align: center;
+            padding: 15px;
+            margin-top: 40px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Heart Disease AI Predictor</h1>
-        <p>Welcome! This is a machine learning-based application that predicts your risk of heart disease based on your health information.</p>
-        <a href="{{ url_for('predict') }}">
-            <button class="btn">Let's Predict</button>
-        </a>
 
-        <!-- Team Members Section -->
-        <div class="team">
-            <h2>Group 81 Members:</h2>
-            <div class="team-cards">
-                <div class="team-card">
-                    <h3>Arnav Sharma</h3>
-                    <p>Team Lead</p>
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Heart Disease AI Predictor</h1>
+        <p>AI-powered health risk assessment tool that predicts your chances of having heart disease<br>
+           based on key health and lifestyle factors.</p>
+        <a href="{{ url_for('predict') }}" class="btn btn-start">Start Prediction</a>
+    </div>
+
+    <!-- About Section -->
+    <div class="section">
+        <h2>About the Project</h2>
+        <div class="container">
+            <p class="text-center" style="max-width: 800px; margin: auto; font-size: 18px; color: #555;">
+                This project leverages advanced <b>Machine Learning (TabPFN Transformer)</b> models to analyze multiple health factors 
+                such as blood pressure, cholesterol, diabetes, and lifestyle habits. The system provides a detailed report on 
+                the probability of heart disease risk, along with recommendations for healthier living.
+            </p>
+        </div>
+    </div>
+
+    <!-- Team Section -->
+    <div class="section" style="background-color: #f1f1f1;">
+        <h2>Meet Our Team (Group 81)</h2>
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Arnav Sharma</h5>
+                        <p><b>Team Lead</b></p>
+                    </div>
                 </div>
-                <div class="team-card">
-                    <h3>Akash Kumar Pandit</h3>
-                    <p>Team Co-Lead</p>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Akash Pandit</h5>
+                        <p><b>Team Co-Lead</b></p>
+                    </div>
                 </div>
-                <div class="team-card">
-                    <h3>Ganta Sanjay Reddy</h3>
-                    <p>Member</p>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Ganta Sanjay Reddy</h5>
+                        <p>Member</p>
+                    </div>
                 </div>
-                <div class="team-card">
-                    <h3>Abhishek Mishra</h3>
-                    <p>Member</p>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Abhishek Mishra</h5>
+                        <p>Member</p>
+                    </div>
                 </div>
-                <div class="team-card">
-                    <h3>Shaurya Shukla</h3>
-                    <p>Member</p>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Shaurya Shukla</h5>
+                        <p>Member</p>
+                    </div>
                 </div>
-                <div class="team-card">
-                    <h3>Atharv Gupta</h3>
-                    <p>Member</p>
+                <div class="col-md-4">
+                    <div class="team-card">
+                        <h5>Atharv Gupta</h5>
+                        <p>Member</p>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>&copy; 2025 Heart Disease AI Predictor | Group 81</p>
+    </div>
+
 </body>
 </html>
