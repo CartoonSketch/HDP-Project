@@ -11,26 +11,22 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from tabpfn_client import TabPFNClassifier
 
-# ================================
-# Config & Paths
-# ================================
+# Config paths
 DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv"
 TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
 USER_PLOTS_DIR = "static/images/user"
 ANALYSIS_PLOTS_DIR = "static/images/analysis"
-MAX_ROWS = 10000  # TabPFN API limit
+MAX_ROWS = 10000 
 
 os.makedirs("model", exist_ok=True)
 os.makedirs(USER_PLOTS_DIR, exist_ok=True)
 os.makedirs(ANALYSIS_PLOTS_DIR, exist_ok=True)
 
-# ================================
 # Load Dataset
-# ================================
 df = pd.read_csv(DATA_PATH)
 
-# Subsample if rows exceed TabPFN limit
+# Divide the dataset for TabPFN limit
 if len(df) > MAX_ROWS:
     print(f"⚠️ Dataset has {len(df)} rows. Subsampling to {MAX_ROWS} rows for TabPFN...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
@@ -40,18 +36,14 @@ y = df[TARGET]
 
 FEATURES = list(X.columns)
 
-# ================================
-# Train-Test Split
-# ================================
+# Train splited dataset
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# ================================
 # Train TabPFN Model via API
-# ================================
 model = TabPFNClassifier()
-print("🚀 Training model using TabPFN API...")
+print("🤖 Training model using TabPFN API...")
 model.fit(X_train, y_train)
 
 # Predictions & Accuracy
@@ -60,15 +52,12 @@ y_prob = model.predict_proba(X_test)[:, 1]
 accuracy = (y_pred == y_test).mean()
 print(f"✅ Model Accuracy: {accuracy:.2f}")
 
-# Save metadata
+# Save dataset
 MODEL_META = {"features": FEATURES, "accuracy": float(accuracy)}
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
-print(f"💾 Model metadata saved at {MODEL_META_PATH}")
+print(f"💾 Trained Dataset saved at {MODEL_META_PATH}")
 
-# ================================
-# Global Analysis Plots
-# ================================
 # Confusion Matrix
 cm = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(6,5))
@@ -115,11 +104,9 @@ for col in X.columns:
     plt.savefig(f"{ANALYSIS_PLOTS_DIR}/density_{col}.png")
     plt.close()
 
-print("📊 Global analysis plots saved!")
+print("📊 All Graph/plots analysis saved!")
 
-# ================================
 # Flask App
-# ================================
 app = Flask(__name__)
 
 SUGGESTIONS = {
@@ -149,7 +136,6 @@ def index():
 @app.route("/predict", methods=["GET","POST"])
 def predict():
     if request.method=="POST":
-        # Get user input
         user_data = []
         for feature in FEATURES:
             val = request.form.get(feature)
@@ -158,7 +144,6 @@ def predict():
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        # Predict
         prob = 0.0
         try:
             proba = model.predict_proba(input_df)
@@ -207,8 +192,6 @@ def predict():
 
     return render_template("predict.html", features=FEATURES)
 
-# ================================
 # Run Flask App
-# ================================
 if __name__ == "__main__":
     app.run(debug=True)
