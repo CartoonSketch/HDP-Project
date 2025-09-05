@@ -1,4 +1,3 @@
-# run.py
 import os
 import json
 import pandas as pd
@@ -20,6 +19,7 @@ TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
 USER_PLOTS_DIR = "static/images/user"
 ANALYSIS_PLOTS_DIR = "static/images/analysis"
+MAX_ROWS = 10000  # TabPFN API limit
 
 os.makedirs("model", exist_ok=True)
 os.makedirs(USER_PLOTS_DIR, exist_ok=True)
@@ -29,6 +29,12 @@ os.makedirs(ANALYSIS_PLOTS_DIR, exist_ok=True)
 # Load Dataset
 # ================================
 df = pd.read_csv(DATA_PATH)
+
+# Subsample if rows exceed TabPFN limit
+if len(df) > MAX_ROWS:
+    print(f"⚠️ Dataset has {len(df)} rows. Subsampling to {MAX_ROWS} rows for TabPFN...")
+    df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
+
 X = df.drop(TARGET, axis=1)
 y = df[TARGET]
 
