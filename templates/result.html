@@ -39,6 +39,7 @@
         .charts {
             display: flex;
             justify-content: space-around;
+            flex-wrap: wrap;
             margin: 20px 0;
         }
         .chart-box img {
@@ -77,15 +78,21 @@
     <h1>Prediction Result</h1>
 
     <div class="result-box">
-        <h2 style="color: {% if prediction == 'High Risk' %}red{% else %}green{% endif %};">
-            Status: {{ prediction }}
-        </h2>
+        {% set color = 'green' %}
+        {% if prediction == 'High Risk' %} {% set color = 'red' %}
+        {% elif prediction == 'Medium Risk' %} {% set color = 'orange' %} {% endif %}
+        
+        <h2 style="color: {{ color }};">Status: {{ prediction }}</h2>
         <p>Heart Disease Risk Probability:</p>
         <div class="progress-container">
-            <div class="progress-bar" style="width: {{ probability }}%; background: {% if prediction == 'High Risk' %}red{% else %}green{% endif %};">
+            <div class="progress-bar" style="width: {{ probability }}%; background: {{ color }};">
                 {{ probability }}%
             </div>
         </div>
+        
+        {% if model_accuracy %}
+            <p>Model Accuracy (Global Test Data): <b>{{ model_accuracy*100 | round(2) }}%</b></p>
+        {% endif %}
     </div>
 
     <h2>User Input Factors</h2>
@@ -108,10 +115,12 @@
             <h3>Risk Probability</h3>
             <img src="{{ url_for('static', filename='images/user/pie_chart.png') }}" alt="Pie Chart">
         </div>
+        {% if bar_chart %}
         <div class="chart-box">
             <h3>Risk Factors</h3>
             <img src="{{ url_for('static', filename='images/user/bar_chart.png') }}" alt="Bar Chart">
         </div>
+        {% endif %}
     </div>
 
     {% if feedback %}
@@ -147,4 +156,4 @@
 
     <p><a href="{{ url_for('index') }}">🔙 Go Back to Home</a></p>
 </body>
-    </html>
+</html>
