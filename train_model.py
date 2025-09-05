@@ -3,12 +3,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import confusion_matrix, classification_report, roc_curve, auc
+from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from tabpfn import TabPFNClassifier
-import pickle
-import os
+from tabpfn_client import TabPFNClient
+import pickle, os
 
 # ================================
 # Load Dataset
@@ -24,24 +23,24 @@ X_train, X_test, y_train, y_test = train_test_split(
 )
 
 # ================================
-# Train TabPFN Model
+# Train TabPFN Model via API
 # ================================
-model = TabPFNClassifier(
-    device="cpu", 
-    N_ensemble_configurations=32, 
-    ignore_pretraining_limits=True
-)
+client = TabPFNClient()
 
-print("🚀 Training TabPFN model... Please wait.")
-model.fit(X_train.values, y_train.values)
+print("🚀 Sending data to TabPFN remote API for training...")
+client.fit(X_train, y_train)
+
+# Predictions
+y_pred = client.predict(X_test)
+y_prob = client.predict_proba(X_test)[:, 1]
 
 # Accuracy
-accuracy = model.score(X_test.values, y_test.values)
+accuracy = (y_pred == y_test).mean()
 print(f"✅ Model Accuracy on test data: {accuracy:.2f}")
 
-# Save Model
+# Save model (pickle stores the client wrapper, but predictions still call API)
 with open("heart_disease_model.pkl", "wb") as f:
-    pickle.dump(model, f)
+    pickle.dump(client, f)
 print("💾 Model saved as 'heart_disease_model.pkl'")
 
 # ================================
@@ -52,10 +51,11 @@ os.makedirs("static/images/analysis", exist_ok=True)
 # ================================
 # Confusion Matrix
 # ================================
-y_pred = model.predict(X_test.values)
 cm = confusion_matrix(y_test, y_pred)
 plt.figure(figsize=(6,5))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=["No Disease", "Disease"], yticklabels=["No Disease", "Disease"])
+sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+            xticklabels=["No Disease", "Disease"],
+            yticklabels=["No Disease", "Disease"])
 plt.title("Confusion Matrix")
 plt.ylabel("Actual")
 plt.xlabel("Predicted")
@@ -65,11 +65,6 @@ plt.close()
 # ================================
 # ROC Curve
 # ================================
-if hasattr(model, "predict_proba"):
-    y_prob = model.predict_proba(X_test.values)[:, 1]
-else:
-    y_prob = np.zeros(len(y_test))  # fallback if no probas
-
 fpr, tpr, _ = roc_curve(y_test, y_prob)
 roc_auc = auc(fpr, tpr)
 plt.figure(figsize=(6,5))
@@ -120,24 +115,5 @@ if "Age" in X.columns:
             plt.title(f"Scatter Plot - Age vs {col}")
             plt.savefig(f"static/images/analysis/scatter_Age_{col}.png")
             plt.close()
-
-# ================================
-# Feature Importance (Permutation Importance Approx)
-# ================================
-try:
-    from sklearn.inspection import permutation_importance
-    result = permutation_importance(model, X_test.values, y_test.values, n_repeats=10, random_state=42)
-    importance = pd.DataFrame({"Feature": X.columns, "Importance": result.importances_mean})
-    importance = importance.sort_values(by="Importance", ascending=False)
-
-    plt.figure(figsize=(8,6))
-    sns.barplot(data=importance, x="Importance", y="Feature", palette="viridis")
-    plt.title("Feature Importance (Permutation)")
-    plt.savefig("static/images/analysis/feature_importance.png")
-    plt.close()
-
-    importance.to_csv("static/images/analysis/feature_importance.csv", index=False)
-except Exception as e:
-    print("⚠️ Could not compute feature importance:", e)
 
 print("📊 All global analysis plots saved in static/images/analysis/")
