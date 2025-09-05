@@ -13,15 +13,18 @@
             border-radius: 8px;
             margin-bottom: 20px;
         }
-        .charts {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
+        .progress-container {
+            background: #eee;
+            border-radius: 10px;
+            overflow: hidden;
+            width: 60%;
+            margin-top: 10px;
         }
-        .chart-box img {
-            max-width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+        .progress-bar {
+            height: 25px;
+            color: white;
+            text-align: center;
+            line-height: 25px;
         }
         .inputs-table {
             border-collapse: collapse;
@@ -33,15 +36,38 @@
             padding: 8px;
             text-align: center;
         }
+        .charts {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .chart-box img {
+            max-width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
         .feedback {
             background: #f8f9fa;
             border-left: 4px solid #e67e22;
             padding: 10px;
-            margin: 15px 0;
+            margin: 10px 0;
+        }
+        .analysis-charts {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 15px;
+        }
+        .analysis-charts img {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+        }
+        .analysis-charts p {
+            text-align: center;
+            margin: 5px 0;
         }
         .links a {
-            display: block;
-            margin: 5px 0;
             color: #2980b9;
             text-decoration: none;
         }
@@ -51,11 +77,15 @@
     <h1>Prediction Result</h1>
 
     <div class="result-box">
-        <h2>Status: {{ prediction }}</h2>
-        <p>Heart Disease Risk Probability: <b>{{ probability }}%</b></p>
-        {% if model_accuracy %}
-        <p><i>Model Test Accuracy (global): {{ model_accuracy|round(2) }}</i></p>
-        {% endif %}
+        <h2 style="color: {% if prediction == 'High Risk' %}red{% else %}green{% endif %};">
+            Status: {{ prediction }}
+        </h2>
+        <p>Heart Disease Risk Probability:</p>
+        <div class="progress-container">
+            <div class="progress-bar" style="width: {{ probability }}%; background: {% if prediction == 'High Risk' %}red{% else %}green{% endif %};">
+                {{ probability }}%
+            </div>
+        </div>
     </div>
 
     <h2>User Input Factors</h2>
@@ -78,31 +108,43 @@
             <h3>Risk Probability</h3>
             <img src="{{ url_for('static', filename='images/user/pie_chart.png') }}" alt="Pie Chart">
         </div>
-        {% if bar_chart %}
         <div class="chart-box">
             <h3>Risk Factors</h3>
             <img src="{{ url_for('static', filename='images/user/bar_chart.png') }}" alt="Bar Chart">
         </div>
-        {% endif %}
     </div>
 
     {% if feedback %}
     <h2>Personalized Health Suggestions</h2>
     {% for msg in feedback %}
-        <div class="feedback">{{ msg }}</div>
+        <div class="feedback">✅ {{ msg }}</div>
     {% endfor %}
     {% endif %}
 
     <h2>Model Analysis (Global Results)</h2>
-    <div class="links">
-        <a href="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" target="_blank">Confusion Matrix</a>
-        <a href="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" target="_blank">ROC Curve</a>
-        <a href="{{ url_for('static', filename='images/analysis/pca_plot.png') }}" target="_blank">PCA Scatter Plot</a>
-        
-        <!-- Instead of single density_plot.png, we could loop through each feature’s density plot -->
-        <a href="{{ url_for('static', filename='images/analysis/') }}" target="_blank">Density Plots (per feature)</a>
+    <div class="analysis-charts">
+        <div>
+            <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" alt="Confusion Matrix">
+            <p><a href="{{ url_for('static', filename='images/confusion_matrix.png') }}" target="_blank">View Full Size</a></p>
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='images/roc_curve.png') }}" alt="ROC Curve">
+            <p><a href="{{ url_for('static', filename='images/roc_curve.png') }}" target="_blank">View Full Size</a></p>
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='images/pca_scatter.png') }}" alt="PCA Scatter">
+            <p><a href="{{ url_for('static', filename='images/pca_scatter.png') }}" target="_blank">View Full Size</a></p>
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='images/feature_importance.png') }}" alt="Feature Importance">
+            <p><a href="{{ url_for('static', filename='images/feature_importance.png') }}" target="_blank">View Full Size</a></p>
+        </div>
+        <div>
+            <img src="{{ url_for('static', filename='images/density_plot.png') }}" alt="Density Plots">
+            <p><a href="{{ url_for('static', filename='images/density_plot.png') }}" target="_blank">View Full Size</a></p>
+        </div>
     </div>
 
     <p><a href="{{ url_for('index') }}">🔙 Go Back to Home</a></p>
 </body>
-</html>
+    </html>
