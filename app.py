@@ -4,12 +4,9 @@ import numpy as np
 import pickle
 import os
 import matplotlib.pyplot as plt
+from tabpfn_client import TabPFNClient
 
 app = Flask(__name__)
-
-# Load trained model
-with open("heart_disease_model.pkl", "rb") as f:
-    model = pickle.load(f)
 
 # Features used in dataset
 FEATURES = [
@@ -42,6 +39,15 @@ SUGGESTIONS = {
 # Ensure user plot folder exists
 os.makedirs("static/images/user", exist_ok=True)
 
+# Load model (TabPFNClient)
+MODEL_PATH = "heart_disease_model.pkl"
+if os.path.exists(MODEL_PATH):
+    with open(MODEL_PATH, "rb") as f:
+        model = pickle.load(f)
+else:
+    model = TabPFNClient()  # create a fresh client if not trained
+    print("⚠️ No model.pkl found, using a new TabPFNClient (make sure to train first).")
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -60,8 +66,13 @@ def predict():
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        # Prediction
-        prob = model.predict_proba(input_df.values)[0][1] * 100
+        # Prediction (remote API call)
+        try:
+            prob = model.predict_proba(input_df)[0][1] * 100
+        except Exception as e:
+            print("❌ Prediction error:", e)
+            prob = 0.0
+
         prediction = "High Risk" if prob >= 60 else "Medium Risk" if prob >= 30 else "Low Risk"
 
         # Save Pie Chart
