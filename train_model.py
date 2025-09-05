@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
-from tabpfn_client import TabPFNClient
+from tabpfn_client import TabPFNClassifier   
 import os, json
 
 # ================================
@@ -25,21 +25,21 @@ X_train, X_test, y_train, y_test = train_test_split(
 # ================================
 # Train TabPFN Model via API
 # ================================
-client = TabPFNClient()
+model = TabPFNClassifier()   # ✅ use classifier, not client
 
 print("🚀 Sending data to TabPFN remote API for training...")
-client.fit(X_train, y_train)
+model.fit(X_train, y_train)
 
 # Predictions
-y_pred = client.predict(X_test)
-y_prob = client.predict_proba(X_test)[:, 1]
+y_pred = model.predict(X_test)
+y_prob = model.predict_proba(X_test)[:, 1]
 
 # Accuracy
 accuracy = (y_pred == y_test).mean()
 print(f"✅ Model Accuracy on test data: {accuracy:.2f}")
 
 # ================================
-# Instead of pickling client (risky), save metadata
+# Save metadata only
 # ================================
 MODEL_META = {
     "features": list(X.columns),
@@ -50,7 +50,7 @@ with open("model/heart_disease_model_meta.json", "w") as f:
     json.dump(MODEL_META, f, indent=4)
 
 print("💾 Model metadata saved as 'model/heart_disease_model_meta.json'")
-print("   (Client is not saved – app.py will instantiate TabPFNClient fresh and use API.)")
+print("   (Model is not pickled – app.py will instantiate TabPFNClassifier fresh and use API.)")
 
 # ================================
 # Create directory for plots
