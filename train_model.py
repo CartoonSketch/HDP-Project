@@ -7,7 +7,7 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from tabpfn_client import TabPFNClient
-import pickle, os
+import os, json
 
 # ================================
 # Load Dataset
@@ -38,10 +38,19 @@ y_prob = client.predict_proba(X_test)[:, 1]
 accuracy = (y_pred == y_test).mean()
 print(f"✅ Model Accuracy on test data: {accuracy:.2f}")
 
-# Save model (pickle stores the client wrapper, but predictions still call API)
-with open("heart_disease_model.pkl", "wb") as f:
-    pickle.dump(client, f)
-print("💾 Model saved as 'heart_disease_model.pkl'")
+# ================================
+# Instead of pickling client (risky), save metadata
+# ================================
+MODEL_META = {
+    "features": list(X.columns),
+    "accuracy": float(accuracy)
+}
+os.makedirs("model", exist_ok=True)
+with open("model/heart_disease_model_meta.json", "w") as f:
+    json.dump(MODEL_META, f, indent=4)
+
+print("💾 Model metadata saved as 'model/heart_disease_model_meta.json'")
+print("   (Client is not saved – app.py will instantiate TabPFNClient fresh and use API.)")
 
 # ================================
 # Create directory for plots
