@@ -53,6 +53,9 @@
     <div class="result-box">
         <h2>Status: {{ prediction }}</h2>
         <p>Heart Disease Risk Probability: <b>{{ probability }}%</b></p>
+        {% if model_accuracy %}
+        <p><i>Model Test Accuracy (global): {{ model_accuracy|round(2) }}</i></p>
+        {% endif %}
     </div>
 
     <h2>User Input Factors</h2>
@@ -75,10 +78,12 @@
             <h3>Risk Probability</h3>
             <img src="{{ url_for('static', filename='images/user/pie_chart.png') }}" alt="Pie Chart">
         </div>
+        {% if bar_chart %}
         <div class="chart-box">
             <h3>Risk Factors</h3>
             <img src="{{ url_for('static', filename='images/user/bar_chart.png') }}" alt="Bar Chart">
         </div>
+        {% endif %}
     </div>
 
     {% if feedback %}
@@ -90,11 +95,12 @@
 
     <h2>Model Analysis (Global Results)</h2>
     <div class="links">
-        <a href="{{ url_for('static', filename='images/confusion_matrix.png') }}" target="_blank">Confusion Matrix</a>
-        <a href="{{ url_for('static', filename='images/roc_curve.png') }}" target="_blank">ROC Curve</a>
-        <a href="{{ url_for('static', filename='images/pca_scatter.png') }}" target="_blank">PCA Scatter Plot</a>
-        <a href="{{ url_for('static', filename='images/feature_importance.png') }}" target="_blank">Feature Importance</a>
-        <a href="{{ url_for('static', filename='images/density_plot.png') }}" target="_blank">Density Plots</a>
+        <a href="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" target="_blank">Confusion Matrix</a>
+        <a href="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" target="_blank">ROC Curve</a>
+        <a href="{{ url_for('static', filename='images/analysis/pca_plot.png') }}" target="_blank">PCA Scatter Plot</a>
+        
+        <!-- Instead of single density_plot.png, we could loop through each feature’s density plot -->
+        <a href="{{ url_for('static', filename='images/analysis/') }}" target="_blank">Density Plots (per feature)</a>
     </div>
 
     <p><a href="{{ url_for('index') }}">🔙 Go Back to Home</a></p>
