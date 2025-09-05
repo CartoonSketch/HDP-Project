@@ -28,7 +28,7 @@ df = pd.read_csv(DATA_PATH)
 
 # Divide the dataset for TabPFN limit
 if len(df) > MAX_ROWS:
-    print(f"⚠️ Dataset has {len(df)} rows. Subsampling to {MAX_ROWS} rows for TabPFN...")
+    print(f"⚠️ Dataset has {len(df)} rows. So dividing into {MAX_ROWS} rows for TabPFN...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
 
 X = df.drop(TARGET, axis=1)
