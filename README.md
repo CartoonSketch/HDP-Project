@@ -1,6 +1,5 @@
 # Heart Disease AI Predictor
 
-## Project Description
 The Heart Disease AI Predictor is a machine learning-based web application built using **Python, Flask, and scikit-learn**. It predicts the likelihood of a person having heart disease based on 19 health-related factors such as blood pressure, cholesterol, diabetes, lifestyle habits, and more.  
 
 Users can provide their health information through a **user-friendly web form**, and the application will return a **risk prediction** along with the **probability percentage** and **model accuracy**.
