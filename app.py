@@ -3,12 +3,12 @@ import pandas as pd
 import numpy as np
 import os
 import matplotlib.pyplot as plt
-from tabpfn_client import TabPFNClassifier   # ✅ Correct import
+from tabpfn_client import TabPFNClassifier   
 import json
 
 app = Flask(__name__)
 
-# Features used in dataset (must match train_model.py exactly)
+# Features used in dataset
 FEATURES = [
     "HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", "Diabetes",
     "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare",
@@ -39,17 +39,15 @@ SUGGESTIONS = {
 # Ensure user plot folder exists
 os.makedirs("static/images/user", exist_ok=True)
 
-# ================================
-# Load metadata instead of pickled model
-# ================================
+# Load trained data
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
 if os.path.exists(MODEL_META_PATH):
     with open(MODEL_META_PATH, "r") as f:
         MODEL_META = json.load(f)
-    print("✅ Model metadata loaded successfully:", MODEL_META)
+    print("✅ Dataset loaded successfully:", MODEL_META)
 else:
     MODEL_META = {"features": FEATURES, "accuracy": None}
-    print("⚠️ No metadata found. Please run train_model.py first.")
+    print("⚠️ No Dataset found. Please run train_model.py first.")
 
 # Always create a fresh classifier (connects to API)
 model = TabPFNClassifier()
@@ -61,7 +59,6 @@ def index():
 @app.route("/predict", methods=["GET", "POST"])
 def predict():
     if request.method == "POST":
-        # Get user inputs safely
         user_data = []
         for feature in FEATURES:
             value = request.form.get(feature)
@@ -98,10 +95,10 @@ def predict():
         plt.savefig(pie_path)
         plt.close()
 
-        # Save Bar Chart (showing non-zero inputs only)
+        # Save Bar Chart 
         user_features = dict(zip(FEATURES, user_data))
         risky_features = {f: v for f, v in user_features.items() if v > 0}
-        if risky_features:  # avoid empty chart crash
+        if risky_features:  
             plt.figure(figsize=(8,5))
             plt.bar(risky_features.keys(), risky_features.values(), color="orange")
             plt.title("User Health Factors (Non-zero values)")
