@@ -1,129 +1,107 @@
-import os
-import io
-import base64
+from flask import Flask, render_template, request
 import pandas as pd
 import numpy as np
-from flask import Flask, render_template, request
-import matplotlib.pyplot as plt
-import seaborn as sns
 import pickle
+import os
+import matplotlib.pyplot as plt
 
-# Flask App
 app = Flask(__name__)
 
 # Load trained model
-with open('heart_disease_model.pkl', 'rb') as f:
+with open("heart_disease_model.pkl", "rb") as f:
     model = pickle.load(f)
 
+# Features used in dataset
+FEATURES = [
+    "HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", "Diabetes",
+    "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare",
+    "NoDocbcCost", "GenHlth", "PhysHlth", "DiffWalk", "Sex", "Age"
+]
 
-# Function to generate Matplotlib figure and return base64 string
-def plot_to_img(fig):
-    buf = io.BytesIO()
-    fig.savefig(buf, format="png", bbox_inches="tight")
-    buf.seek(0)
-    img_base64 = base64.b64encode(buf.getvalue()).decode("utf-8")
-    plt.close(fig)
-    return img_base64
+# Suggestions mapping
+SUGGESTIONS = {
+    "HighBP": "Consider regular exercise and a low-sodium diet to manage blood pressure.",
+    "HighChol": "Limit fatty foods and increase fiber intake to lower cholesterol.",
+    "BMI": "Maintain a healthy weight through balanced diet and physical activity.",
+    "Smoker": "Quitting smoking greatly reduces heart disease risk.",
+    "Stroke": "Consult a doctor for stroke management and prevention.",
+    "Diabetes": "Manage sugar intake and monitor glucose levels regularly.",
+    "PhysActivity": "Engage in at least 30 minutes of physical activity daily.",
+    "Fruits": "Eat more fruits rich in vitamins and antioxidants.",
+    "Veggies": "Include leafy vegetables in your meals daily.",
+    "HvyAlcoholConsump": "Reduce alcohol consumption to protect heart health.",
+    "AnyHealthcare": "Regular medical checkups are important for prevention.",
+    "NoDocbcCost": "Seek affordable healthcare options to maintain health monitoring.",
+    "GenHlth": "Work on improving general health through lifestyle changes.",
+    "PhysHlth": "Pay attention to physical health; consult doctor if persistent issues.",
+    "DiffWalk": "Physical therapy or regular walking may improve mobility.",
+    "Sex": "Some risks vary by gender—consult doctor for personalized advice.",
+    "Age": "With age, regular health checkups become more important."
+}
 
+# Ensure user plot folder exists
+os.makedirs("static/images/user", exist_ok=True)
 
-# Health recommendations based on input
-def generate_recommendations(inputs):
-    feedback = []
+@app.route("/")
+def index():
+    return render_template("index.html")
 
-    if inputs.get("HighBP", 0) == 1:
-        feedback.append("Maintain healthy blood pressure by reducing salt intake and exercising regularly.")
-
-    if inputs.get("HighChol", 0) == 1:
-        feedback.append("Follow a heart-healthy diet to lower cholesterol levels.")
-
-    if inputs.get("Smoker", 0) == 1:
-        feedback.append("Quitting smoking will significantly reduce your heart disease risk.")
-
-    if inputs.get("BMI", 0) > 30:
-        feedback.append("Consider a weight management plan to lower your BMI.")
-
-    if inputs.get("PhysActivity", 0) == 0:
-        feedback.append("Engage in at least 30 minutes of physical activity daily.")
-
-    if inputs.get("GenHlth", 0) >= 4:
-        feedback.append("Schedule regular health checkups to improve your general health.")
-
-    if not feedback:
-        feedback.append("You are maintaining a healthy lifestyle. Keep it up!")
-
-    return feedback
-
-
-@app.route('/')
-def home():
-    return render_template('index.html')
-
-
-@app.route('/predict', methods=['POST'])
+@app.route("/predict", methods=["GET", "POST"])
 def predict():
-    try:
-        # Collect inputs
-        inputs = {
-            "HighBP": int(request.form['HighBP']),
-            "HighChol": int(request.form['HighChol']),
-            "CholCheck": int(request.form['CholCheck']),
-            "BMI": float(request.form['BMI']),
-            "Smoker": int(request.form['Smoker']),
-            "Stroke": int(request.form['Stroke']),
-            "Diabetes": int(request.form['Diabetes']),
-            "PhysActivity": int(request.form['PhysActivity']),
-            "Fruits": int(request.form['Fruits']),
-            "Veggies": int(request.form['Veggies']),
-            "HvyAlcoholConsump": int(request.form['HvyAlcoholConsump']),
-            "AnyHealthcare": int(request.form['AnyHealthcare']),
-            "NoDocbcCost": int(request.form['NoDocbcCost']),
-            "GenHlth": int(request.form['GenHlth']),
-            "MentHlth": int(request.form['MentHlth']),
-            "PhysHlth": int(request.form['PhysHlth']),
-            "DiffWalk": int(request.form['DiffWalk']),
-            "Sex": int(request.form['Sex']),
-            "Age": int(request.form['Age']),
-            "Education": int(request.form['Education']),
-            "Income": int(request.form['Income'])
-        }
+    if request.method == "POST":
+        # Get user inputs
+        user_data = []
+        for feature in FEATURES:
+            value = request.form.get(feature)
+            try:
+                user_data.append(float(value))
+            except:
+                user_data.append(0.0)
 
-        input_df = pd.DataFrame([inputs])
+        input_df = pd.DataFrame([user_data], columns=FEATURES)
 
         # Prediction
-        prediction = model.predict(input_df.values)[0]
-        probability = model.predict_proba(input_df.values)[0][1] * 100
+        prob = model.predict_proba(input_df.values)[0][1] * 100
+        prediction = "High Risk" if prob >= 60 else "Medium Risk" if prob >= 30 else "Low Risk"
 
-        risk_status = "High Risk" if prediction == 1 else "Low Risk"
+        # Save Pie Chart
+        labels = ["No Risk", "Heart Disease Risk"]
+        values = [100 - prob, prob]
+        plt.figure(figsize=(5,5))
+        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, colors=["#4CAF50","#E63946"])
+        plt.title("Risk Probability")
+        pie_path = "static/images/user/pie_chart.png"
+        plt.savefig(pie_path)
+        plt.close()
 
-        # Generate charts
-        # Pie chart
-        fig1, ax1 = plt.subplots()
-        ax1.pie([probability, 100 - probability], labels=["Risk", "Safe"], autopct='%1.1f%%', colors=["#ff4d4d", "#4dff88"])
-        pie_chart = plot_to_img(fig1)
+        # Save Bar Chart (showing risky inputs only)
+        user_features = dict(zip(FEATURES, user_data))
+        risky_features = {f: v for f,v in user_features.items() if v > 0}
+        plt.figure(figsize=(8,5))
+        plt.bar(risky_features.keys(), risky_features.values(), color="orange")
+        plt.title("User Health Factors (Non-zero values)")
+        plt.xticks(rotation=45, ha="right")
+        bar_path = "static/images/user/bar_chart.png"
+        plt.savefig(bar_path)
+        plt.close()
 
-        # Bar chart for risk factors
-        fig2, ax2 = plt.subplots(figsize=(8, 4))
-        sns.barplot(x=list(inputs.keys()), y=list(inputs.values()), ax=ax2)
-        plt.xticks(rotation=90)
-        plt.title("Patient Feature Profile")
-        bar_chart = plot_to_img(fig2)
-
-        # Generate feedback
-        feedback = generate_recommendations(inputs)
+        # Collect Suggestions
+        feedback = []
+        for f, v in risky_features.items():
+            if f in SUGGESTIONS:
+                feedback.append(SUGGESTIONS[f])
 
         return render_template(
-            'result.html',
-            risk_status=risk_status,
-            probability=round(probability, 2),
-            inputs=inputs,
-            pie_chart=pie_chart,
-            bar_chart=bar_chart,
+            "result.html",
+            prediction=prediction,
+            probability=round(prob,2),
+            inputs=user_features,
+            pie_chart=pie_path,
+            bar_chart=bar_path,
             feedback=feedback
         )
 
-    except Exception as e:
-        return f"Error: {str(e)}"
-
+    return render_template("predict.html", features=FEATURES)
 
 if __name__ == "__main__":
     app.run(debug=True)
