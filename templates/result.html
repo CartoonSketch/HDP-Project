@@ -1,208 +1,296 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Heart Disease Prediction - Result</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h1 { color: #2c3e50; }
-        .result-box {
-            padding: 15px;
-            border: 2px solid #ccc;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-        .progress-container {
-            background: #eee;
-            border-radius: 10px;
-            overflow: hidden;
-            width: 60%;
-            margin-top: 10px;
-        }
-        .progress-bar {
-            height: 25px;
-            color: white;
-            text-align: center;
-            line-height: 25px;
-        }
-        .inputs-table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 20px 0;
-        }
-        .inputs-table th, .inputs-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: center;
-        }
-        .charts {
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-            margin: 20px 0;
-        }
-        .chart-box img {
-            max-width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .feedback {
-            background: #f8f9fa;
-            border-left: 4px solid #e67e22;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .analysis-charts {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 15px;
-        }
-        .analysis-charts img {
-            width: 100%;
-            border: 1px solid #ddd;
-            border-radius: 6px;
-        }
-        .analysis-charts p {
-            text-align: center;
-            margin: 5px 0;
-        }
-        .links a {
-            color: #2980b9;
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Heart Disease AI Predictor - Result</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #e63946, #457b9d, #1d3557);
+      background-size: 600% 600%;
+      animation: gradientBG 12s ease infinite;
+      color: white;
+      overflow-x: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .hero {
+      position: relative;
+      text-align: center;
+      padding: 100px 20px 60px 20px;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-top: 20px;
+    }
+
+    .hero p {
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+
+    .heart-icon {
+      font-size: 80px;
+      color: #ffccd5;
+      animation: heartbeat 1.5s infinite;
+      display: block;
+      margin: 0 auto;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); color: #ffccd5; }
+      25% { transform: scale(1.2); color: #ff4d6d; }
+      50% { transform: scale(1); color: #ffccd5; }
+      75% { transform: scale(1.2); color: #ff4d6d; }
+    }
+
+    .card {
+      border-radius: 12px;
+      box-shadow: 0px 4px 12px rgba(0,0,0,0.2);
+      padding: 20px;
+      margin-bottom: 30px;
+      background-color: rgba(255,255,255,0.95);
+      color: #333;
+    }
+
+    .progress-container {
+      background: #f1f1f1;
+      border-radius: 10px;
+      overflow: hidden;
+      margin: 15px 0;
+    }
+
+    .progress-bar {
+      height: 28px;
+      color: white;
+      text-align: center;
+      line-height: 28px;
+      font-weight: bold;
+      transition: width 1s ease-in-out;
+    }
+
+    .inputs-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .inputs-table th, .inputs-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .feedback {
+      background: #f8f9fa;
+      border-left: 4px solid #e63946;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 6px;
+    }
+
+    .analysis-charts {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .analysis-charts img {
+      width: 100%;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: white;
+      padding: 10px;
+    }
+
+    .chart-box {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .btn-home {
+      background: linear-gradient(45deg, #ff4d6d, #ff758f);
+      color: white;
+      font-weight: bold;
+      border-radius: 50px;
+      padding: 12px 25px;
+      font-size: 16px;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .btn-home:hover {
+      background: linear-gradient(45deg, #ff758f, #ff4d6d);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .wave-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      overflow: hidden;
+      line-height: 0;
+      transform: rotate(180deg);
+    }
+
+    .wave-container svg {
+      position: relative;
+      display: block;
+      width: calc(200% + 1.3px);
+      height: 100px;
+      animation: waveMotion 8s linear infinite;
+    }
+
+    @keyframes waveMotion {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    .footer {
+      background-color: #1d3557;
+      text-align: center;
+      padding: 20px;
+      color: white;
+      margin-top: 40px;
+    }
+  </style>
 </head>
 <body>
-    <h1>Prediction Result</h1>
-    <div class="result-box">
-        {% set color = 'green' %}
-        {% if prediction == 'High Risk' %} {% set color = 'red' %}
-        {% elif prediction == 'Medium Risk' %} {% set color = 'orange' %} {% endif %}
-        
-        <h2 style="color: {{ color }};">Status: {{ prediction }}</h2>
-        <p>Heart Disease Risk Probability:</p>
-        <div class="progress-container">
-            <div class="progress-bar" style="width: {{ probability }}%; background: {{ color }};">
-                {{ probability }}%
-            </div>
+
+  <!-- Hero Section -->
+  <div class="hero">
+    <div class="heart-icon">❤</div>
+    <h1>Your Prediction Result</h1>
+    <p>Based on your health details, here is your AI-powered risk assessment</p>
+
+    <div class="wave-container">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none">
+        <path d="M0,30 C150,80 350,0 600,40 C850,80 1050,20 1200,50 L1200,100 L0,100 Z" 
+              fill="rgba(255,255,255,0.2)">
+        </path>
+      </svg>
+    </div>
+  </div>
+
+  <div class="container section">
+
+    <!-- Prediction Status -->
+    <div class="card text-center">
+      {% set color = 'green' %}
+      {% if prediction == 'High Risk' %} {% set color = 'red' %}
+      {% elif prediction == 'Medium Risk' %} {% set color = 'orange' %} {% endif %}
+      
+      <h2 style="color: {{ color }};">Status: {{ prediction }}</h2>
+      <p>Heart Disease Risk Probability:</p>
+      <div class="progress-container">
+        <div class="progress-bar" style="width: {{ probability }}%; background: {{ color }};">
+          {{ probability }}%
         </div>
-        
-        {% if model_accuracy %}
-            <p>Model Accuracy: <b>{{ model_accuracy*100 | round(2) }}%</b></p>
-        {% endif %}
+      </div>
+      {% if model_accuracy %}
+        <p>Model Accuracy: <b>{{ model_accuracy*100 | round(2) }}%</b></p>
+      {% endif %}
     </div>
 
-    <h2>User Input Factors</h2>
-    <table class="inputs-table">
+    <!-- User Input -->
+    <div class="card">
+      <h3 class="text-center">Your Provided Health Factors</h3>
+      <table class="inputs-table">
         <tr>
-            <th>Feature</th>
-            <th>Value</th>
+          <th>Feature</th>
+          <th>Value</th>
         </tr>
         {% for f, v in inputs.items() %}
         <tr>
-            <td>{{ f }}</td>
-            <td>{{ v }}</td>
+          <td>{{ f }}</td>
+          <td>{{ v }}</td>
         </tr>
         {% endfor %}
-    </table>
-
-    <h2>Your Health Report</h2>
-    <div class="charts">
-        <div class="chart-box">
-            <h3>Risk Probability</h3>
-            <img src="{{ url_for('static', filename='images/user/pie_chart.png') }}" alt="Pie Chart">
-        </div>
-        {% if bar_chart %}
-        <div class="chart-box">
-            <h3>Risk Factors</h3>
-            <img src="{{ url_for('static', filename='images/user/bar_chart.png') }}" alt="Bar Chart">
-        </div>
-        {% endif %}
+      </table>
     </div>
 
+    <!-- Charts -->
+    <div class="card">
+      <h3 class="text-center">Visual Reports</h3>
+      <div class="chart-box">
+        <h4>Risk Probability</h4>
+        <img src="{{ url_for('static', filename='images/user/pie_chart.png') }}" alt="Pie Chart">
+      </div>
+      {% if bar_chart %}
+      <div class="chart-box">
+        <h4>Risk Factors</h4>
+        <img src="{{ url_for('static', filename='images/user/bar_chart.png') }}" alt="Bar Chart">
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Suggestions -->
     {% if feedback %}
-    <h2>Personalized Health Suggestions</h2>
-    {% for msg in feedback %}
+    <div class="card">
+      <h3 class="text-center">Personalized Health Suggestions</h3>
+      {% for msg in feedback %}
         <div class="feedback">✅ {{ msg }}</div>
-    {% endfor %}
+      {% endfor %}
+    </div>
     {% endif %}
 
-    <h2>Model Analysis</h2>
-    <div class="analysis-charts">
+    <!-- Model Analysis -->
+    <div class="card">
+      <h3 class="text-center">Model Analysis</h3>
+      <div class="analysis-charts">
         <div>
-            <img src="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" alt="Confusion Matrix">
-            <p><a href="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" target="_blank">View Full Size</a></p>
+          <img src="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" alt="Confusion Matrix">
+          <p><a href="{{ url_for('static', filename='images/analysis/confusion_matrix.png') }}" target="_blank">View Full Size</a></p>
         </div>
         <div>
-            <img src="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" alt="ROC Curve">
-            <p><a href="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" target="_blank">View Full Size</a></p>
+          <img src="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" alt="ROC Curve">
+          <p><a href="{{ url_for('static', filename='images/analysis/roc_curve.png') }}" target="_blank">View Full Size</a></p>
         </div>
         <div>
-            <img src="{{ url_for('static', filename='images/analysis/pca_scatter.png') }}" alt="PCA Scatter">
-            <p><a href="{{ url_for('static', filename='images/analysis/pca_scatter.png') }}" target="_blank">View Full Size</a></p>
+          <img src="{{ url_for('static', filename='images/analysis/pca_scatter.png') }}" alt="PCA Scatter">
+          <p><a href="{{ url_for('static', filename='images/analysis/pca_scatter.png') }}" target="_blank">View Full Size</a></p>
         </div>
+      </div>
     </div>
 
-    <h2>Density Plot Analysis</h2>
-    <div class="analysis-charts">
+    <!-- Density Plots -->
+    <div class="card">
+      <h3 class="text-center">Density Plot Analysis</h3>
+      <div class="analysis-charts">
+        {% for plot in [
+          'Age','AnyHealthcare','BMI','CholCheck','Diabetes','DiffWalk',
+          'Fruits','GenHlth','HighBP','HighChol','HvyAlcoholConsump',
+          'NoDocbcCost','PhysActivity','PhysHlth','Sex','Smoker','Stroke','Veggies'] %}
         <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Age.png') }}" alt="Density Plots">
+          <img src="{{ url_for('static', filename='images/analysis/density_' + plot + '.png') }}" alt="Density {{ plot }}">
         </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_AnyHealthcare.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_BMI.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_CholCheck.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Diabetes.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_DiffWalk.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Fruits.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_GenHlth.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_HighBP.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_HighChol.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_HvyAlcoholConsump.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_NoDocbcCost.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_PhysActivity.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_PhysHlth.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Sex.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Smoker.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Stroke.png') }}" alt="Density Plots">
-        </div>
-        <div>
-            <img src="{{ url_for('static', filename='images/analysis/density_Veggies.png') }}" alt="Density Plots">
-        </div>
+        {% endfor %}
+      </div>
     </div>
 
-    <p><a href="{{ url_for('index') }}">🔙 Go Back to Home</a></p>
+    <!-- Back Button -->
+    <div class="text-center mb-5">
+      <a href="{{ url_for('index') }}" class="btn-home">🔙 Go Back to Home</a>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 Heart Disease AI Predictor | Group 81</p>
+  </div>
+
 </body>
 </html>
