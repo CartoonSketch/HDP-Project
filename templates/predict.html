@@ -1,201 +1,270 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Heart Disease Prediction - Input</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <style>
-        body {
-            background: #f5f7fa;
-            padding: 30px;
-        }
-        .card {
-            border-radius: 12px;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-            background: #fff;
-        }
-        h2 {
-            color: #2c3e50;
-            font-weight: 600;
-        }
-        label {
-            font-weight: 500;
-        }
-        .btn {
-            background-color: #2980b9;
-            color: white;
-            font-size: 18px;
-            padding: 10px 20px;
-            border-radius: 8px;
-        }
-        .btn:hover {
-            background-color: #1f618d;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Heart Disease Prediction - Input</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(270deg, #e63946, #457b9d, #1d3557);
+      background-size: 600% 600%;
+      animation: gradientBG 12s ease infinite;
+      color: white;
+      overflow-x: hidden;
+      padding: 40px 20px;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .heart-icon {
+      font-size: 90px;
+      color: #ffccd5;
+      animation: heartbeat 1.5s infinite;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); color: #ffccd5; }
+      25% { transform: scale(1.2); color: #ff4d6d; }
+      50% { transform: scale(1); color: #ffccd5; }
+      75% { transform: scale(1.2); color: #ff4d6d; }
+    }
+
+    h2 {
+      font-weight: bold;
+      color: #fff;
+      margin-top: 15px;
+    }
+
+    .form-card {
+      background: #fff;
+      border-radius: 15px;
+      padding: 30px;
+      max-width: 700px;
+      margin: auto;
+      color: #333;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+      animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    label {
+      font-weight: 500;
+      margin-bottom: 5px;
+    }
+
+    .form-control, .form-select {
+      border-radius: 8px;
+    }
+
+    .btn-submit {
+      margin-top: 20px;
+      background: linear-gradient(45deg, #ff4d6d, #ff758f);
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 50px;
+      padding: 12px 30px;
+      font-size: 18px;
+      transition: all 0.3s;
+    }
+    .btn-submit:hover {
+      transform: scale(1.05);
+      background: linear-gradient(45deg, #ff758f, #ff4d6d);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 50px;
+      padding: 15px;
+      background-color: #1d3557;
+      border-radius: 12px;
+      color: white;
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <div class="card p-4">
-        <h2 class="mb-4 text-center">Provide Your Health Details</h2>
-        <form method="POST" action="/predict">
 
-            <!-- High BP -->
-            <div class="mb-3">
-                <label class="form-label">Do you have High Blood Pressure?</label>
-                <select class="form-select" name="HighBP">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+  <div class="text-center mb-4">
+    <div class="heart-icon">❤</div>
+    <h2>Provide Your Health Details</h2>
+    <p class="text-light">Fill in the details below to predict your heart disease risk</p>
+  </div>
 
-            <!-- High Chol -->
-            <div class="mb-3">
-                <label class="form-label">Do you have High Cholesterol?</label>
-                <select class="form-select" name="HighChol">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+  <div class="form-card">
+    <form method="POST" action="/predict">
 
-            <!-- Chol Check -->
-            <div class="mb-3">
-                <label class="form-label">Cholesterol Check in last 5 years?</label>
-                <select class="form-select" name="CholCheck">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- High BP -->
+      <div class="mb-3">
+        <label class="form-label">Do you have High Blood Pressure?</label>
+        <select class="form-select" name="HighBP">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- BMI -->
-            <div class="mb-3">
-                <label class="form-label">BMI (Body Mass Index)</label>
-                <input type="number" step="0.1" class="form-control" name="BMI" placeholder="e.g., 23.5" required>
-            </div>
+      <!-- High Chol -->
+      <div class="mb-3">
+        <label class="form-label">Do you have High Cholesterol?</label>
+        <select class="form-select" name="HighChol">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Smoker -->
-            <div class="mb-3">
-                <label class="form-label">Are you a Smoker?</label>
-                <select class="form-select" name="Smoker">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Chol Check -->
+      <div class="mb-3">
+        <label class="form-label">Cholesterol Check in last 5 years?</label>
+        <select class="form-select" name="CholCheck">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Stroke -->
-            <div class="mb-3">
-                <label class="form-label">Have you ever had a Stroke?</label>
-                <select class="form-select" name="Stroke">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- BMI -->
+      <div class="mb-3">
+        <label class="form-label">BMI (Body Mass Index)</label>
+        <input type="number" step="0.1" class="form-control" name="BMI" placeholder="e.g., 23.5" required>
+      </div>
 
-            <!-- Diabetes -->
-            <div class="mb-3">
-                <label class="form-label">Do you have Diabetes?</label>
-                <select class="form-select" name="Diabetes">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Smoker -->
+      <div class="mb-3">
+        <label class="form-label">Are you a Smoker?</label>
+        <select class="form-select" name="Smoker">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Physical Activity -->
-            <div class="mb-3">
-                <label class="form-label">Do you engage in Physical Activity?</label>
-                <select class="form-select" name="PhysActivity">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Stroke -->
+      <div class="mb-3">
+        <label class="form-label">Have you ever had a Stroke?</label>
+        <select class="form-select" name="Stroke">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Fruits -->
-            <div class="mb-3">
-                <label class="form-label">Do you eat Fruits daily?</label>
-                <select class="form-select" name="Fruits">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Diabetes -->
+      <div class="mb-3">
+        <label class="form-label">Do you have Diabetes?</label>
+        <select class="form-select" name="Diabetes">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Veggies -->
-            <div class="mb-3">
-                <label class="form-label">Do you eat Vegetables daily?</label>
-                <select class="form-select" name="Veggies">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Physical Activity -->
+      <div class="mb-3">
+        <label class="form-label">Do you engage in Physical Activity?</label>
+        <select class="form-select" name="PhysActivity">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Alcohol -->
-            <div class="mb-3">
-                <label class="form-label">Do you consume Heavy Alcohol?</label>
-                <select class="form-select" name="HvyAlcoholConsump">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Fruits -->
+      <div class="mb-3">
+        <label class="form-label">Do you eat Fruits daily?</label>
+        <select class="form-select" name="Fruits">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Healthcare -->
-            <div class="mb-3">
-                <label class="form-label">Do you have Access to Healthcare?</label>
-                <select class="form-select" name="AnyHealthcare">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Veggies -->
+      <div class="mb-3">
+        <label class="form-label">Do you eat Vegetables daily?</label>
+        <select class="form-select" name="Veggies">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- No Doctor due to Cost -->
-            <div class="mb-3">
-                <label class="form-label">Skipped doctor visits due to cost?</label>
-                <select class="form-select" name="NoDocbcCost">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- Alcohol -->
+      <div class="mb-3">
+        <label class="form-label">Do you consume Heavy Alcohol?</label>
+        <select class="form-select" name="HvyAlcoholConsump">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- General Health -->
-            <div class="mb-3">
-                <label class="form-label">General Health (1=Excellent, 5=Poor)</label>
-                <input type="number" min="1" max="5" class="form-control" name="GenHlth" required>
-            </div>
+      <!-- Healthcare -->
+      <div class="mb-3">
+        <label class="form-label">Do you have Access to Healthcare?</label>
+        <select class="form-select" name="AnyHealthcare">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Physical Health -->
-            <div class="mb-3">
-                <label class="form-label">Days Physical Health Not Good (0-30)</label>
-                <input type="number" min="0" max="30" class="form-control" name="PhysHlth" required>
-            </div>
+      <!-- No Doctor due to Cost -->
+      <div class="mb-3">
+        <label class="form-label">Skipped doctor visits due to cost?</label>
+        <select class="form-select" name="NoDocbcCost">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Difficulty Walking -->
-            <div class="mb-3">
-                <label class="form-label">Do you have difficulty walking?</label>
-                <select class="form-select" name="DiffWalk">
-                    <option value="0">No</option>
-                    <option value="1">Yes</option>
-                </select>
-            </div>
+      <!-- General Health -->
+      <div class="mb-3">
+        <label class="form-label">General Health (1=Excellent, 5=Poor)</label>
+        <input type="number" min="1" max="5" class="form-control" name="GenHlth" required>
+      </div>
 
-            <!-- Sex -->
-            <div class="mb-3">
-                <label class="form-label">Sex</label>
-                <select class="form-select" name="Sex">
-                    <option value="0">Female</option>
-                    <option value="1">Male</option>
-                </select>
-            </div>
+      <!-- Physical Health -->
+      <div class="mb-3">
+        <label class="form-label">Days Physical Health Not Good (0-30)</label>
+        <input type="number" min="0" max="30" class="form-control" name="PhysHlth" required>
+      </div>
 
-            <!-- Age -->
-            <div class="mb-3">
-                <label class="form-label">Age Category (1=18-24, …, 13=80+)</label>
-                <input type="number" min="1" max="13" class="form-control" name="Age" required>
-            </div>
+      <!-- Difficulty Walking -->
+      <div class="mb-3">
+        <label class="form-label">Do you have difficulty walking?</label>
+        <select class="form-select" name="DiffWalk">
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </div>
 
-            <!-- Submit -->
-            <div class="text-center">
-                <button type="submit" class="btn">Predict My Risk</button>
-            </div>
-        </form>
-    </div>
-</div>
+      <!-- Sex -->
+      <div class="mb-3">
+        <label class="form-label">Sex</label>
+        <select class="form-select" name="Sex">
+          <option value="0">Female</option>
+          <option value="1">Male</option>
+        </select>
+      </div>
+
+      <!-- Age -->
+      <div class="mb-3">
+        <label class="form-label">Age Category (1=18-24, …, 13=80+)</label>
+        <input type="number" min="1" max="13" class="form-control" name="Age" required>
+      </div>
+
+      <!-- Submit -->
+      <div class="text-center">
+        <button type="submit" class="btn-submit">Predict My Risk</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2025 Heart Disease AI Predictor | Group 81</p>
+  </div>
+
 </body>
-    </html>
+</html>
