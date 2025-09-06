@@ -26,9 +26,9 @@ os.makedirs(ANALYSIS_PLOTS_DIR, exist_ok=True)
 # Load Dataset
 df = pd.read_csv(DATA_PATH)
 
-# Divide the dataset for TabPFN limit
+# Dataset rows calculation using TabPFN API
 if len(df) > MAX_ROWS:
-    print(f"⚠️ Dataset has {len(df)} rows. So dividing into {MAX_ROWS} rows for TabPFN...")
+    print(f"⚠️ Dataset found with {len(df)} rows. So importing {len(df)} rows into TabPFN...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
 
 X = df.drop(TARGET, axis=1)
