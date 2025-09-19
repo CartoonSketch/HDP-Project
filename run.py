@@ -17,7 +17,7 @@ TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
 USER_PLOTS_DIR = "static/images/user"
 ANALYSIS_PLOTS_DIR = "static/images/analysis"
-MAX_ROWS = 202437
+MAX_ROWS = 10000
 
 os.makedirs("model", exist_ok=True)
 os.makedirs(USER_PLOTS_DIR, exist_ok=True)
