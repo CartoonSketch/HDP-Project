@@ -126,14 +126,15 @@ for name, model in models.items():
         density_path = f"{plot_dir}/density_{col}.png"
         plt.savefig(density_path)
         plt.close()
-        density_paths[col] = density_path
+        # Save relative path for template
+        density_paths[col] = density_path.replace("static/", "")
     
-    # Save results for template
+    # Save results for template (relative paths)
     model_results[name] = {
         "accuracy": round(acc*100,2),
-        "confusion_matrix": cm_path,
-        "roc_curve": roc_path,
-        "pca_scatter": pca_path,
+        "confusion_matrix": cm_path.replace("static/", ""),
+        "roc_curve": roc_path.replace("static/", ""),
+        "pca_scatter": pca_path.replace("static/", ""),
         "density": density_paths
     }
 
@@ -236,8 +237,8 @@ def predict():
             prediction=prediction,
             probability=round(prob,2),
             inputs=user_features,
-            pie_chart=pie_path,
-            bar_chart=bar_path,
+            pie_chart=pie_path.replace("static/", ""),
+            bar_chart=bar_path.replace("static/", "") if bar_path else None,
             feedback=feedback,
             model_results=results
         )
