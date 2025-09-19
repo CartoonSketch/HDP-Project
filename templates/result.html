@@ -64,11 +64,17 @@
       color: #333;
     }
 
-    .progress-container {
-      background: #f1f1f1;
-      border-radius: 10px;
-      overflow: hidden;
-      margin: 15px 0;
+    .inputs-table, .comparison-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 20px;
+    }
+
+    .inputs-table th, .inputs-table td,
+    .comparison-table th, .comparison-table td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
     }
 
     .progress-bar {
@@ -78,18 +84,6 @@
       line-height: 28px;
       font-weight: bold;
       transition: width 1s ease-in-out;
-    }
-
-    .inputs-table {
-      border-collapse: collapse;
-      width: 100%;
-      margin-top: 20px;
-    }
-
-    .inputs-table th, .inputs-table td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
     }
 
     .feedback {
@@ -187,22 +181,47 @@
 
   <div class="container section">
 
-    <!-- Prediction Status -->
-    <div class="card text-center">
-      {% set color = 'green' %}
-      {% if prediction == 'High Risk' %} {% set color = 'red' %}
-      {% elif prediction == 'Medium Risk' %} {% set color = 'orange' %} {% endif %}
-      
-      <h2 style="color: {{ color }};">Status: {{ prediction }}</h2>
-      <p>Heart Disease Risk Probability:</p>
-      <div class="progress-container">
-        <div class="progress-bar" style="width: {{ probability }}%; background: {{ color }};">
-          {{ probability }}%
-        </div>
-      </div>
-      {% if model_accuracy %}
-        <p>Model Accuracy: <b>{{ model_accuracy*100 | round(2) }}%</b></p>
-      {% endif %}
+    <!-- Prediction Comparison -->
+    <div class="card">
+      <h3 class="text-center">Model Comparison</h3>
+      <table class="comparison-table">
+        <thead>
+          <tr>
+            <th>Model</th>
+            <th>Prediction</th>
+            <th>Probability</th>
+            <th>Accuracy</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for model, data in results.items() %}
+          <tr>
+            <td><b>{{ model }}</b></td>
+            <td style="color:
+                {% if data.pred == 'High Risk' %}red
+                {% elif data.pred == 'Medium Risk' %}orange
+                {% else %}green
+                {% endif %};
+            ">{{ data.pred }}</td>
+            <td>
+              {% if data.prob %}
+                <div class="progress-container">
+                  <div class="progress-bar" style="width: {{ data.prob }}%; 
+                      background:
+                      {% if data.pred == 'High Risk' %}red
+                      {% elif data.pred == 'Medium Risk' %}orange
+                      {% else %}green
+                      {% endif %};">
+                      {{ data.prob }}%
+                  </div>
+                </div>
+              {% else %} N/A {% endif %}
+            </td>
+            <td>{{ data.acc if data.acc else "N/A" }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
     </div>
 
     <!-- User Input -->
@@ -293,4 +312,4 @@
   </div>
 
 </body>
-</html>
+                  </html>
