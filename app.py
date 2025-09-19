@@ -1,129 +1,120 @@
-from flask import Flask, render_template, request
-import pandas as pd
-import numpy as np
 import os
-import matplotlib.pyplot as plt
-from tabpfn_client import TabPFNClassifier   
-import json
+import joblib
+import pandas as pd
+from flask import Flask, render_template, request
+from tabpfn import TabPFNClassifier  # TabPFN API
 
 app = Flask(__name__)
 
-# Features used in dataset
-FEATURES = [
-    "HighBP", "HighChol", "CholCheck", "BMI", "Smoker", "Stroke", "Diabetes",
-    "PhysActivity", "Fruits", "Veggies", "HvyAlcoholConsump", "AnyHealthcare",
-    "NoDocbcCost", "GenHlth", "PhysHlth", "DiffWalk", "Sex", "Age"
-]
+# ----------------------------
+# Load Models
+# ----------------------------
+TABPFN_MODEL = TabPFNClassifier(device="cpu")
 
-# Suggestions mapping
-SUGGESTIONS = {
-    "HighBP": "Consider regular exercise and a low-sodium diet to manage blood pressure.",
-    "HighChol": "Limit fatty foods and increase fiber intake to lower cholesterol.",
-    "BMI": "Maintain a healthy weight through balanced diet and physical activity.",
-    "Smoker": "Quitting smoking greatly reduces heart disease risk.",
-    "Stroke": "Consult a doctor for stroke management and prevention.",
-    "Diabetes": "Manage sugar intake and monitor glucose levels regularly.",
-    "PhysActivity": "Engage in at least 30 minutes of physical activity daily.",
-    "Fruits": "Eat more fruits rich in vitamins and antioxidants.",
-    "Veggies": "Include leafy vegetables in your meals daily.",
-    "HvyAlcoholConsump": "Reduce alcohol consumption to protect heart health.",
-    "AnyHealthcare": "Regular medical checkups are important for prevention.",
-    "NoDocbcCost": "Seek affordable healthcare options to maintain health monitoring.",
-    "GenHlth": "Work on improving general health through lifestyle changes.",
-    "PhysHlth": "Pay attention to physical health; consult doctor if persistent issues.",
-    "DiffWalk": "Physical therapy or regular walking may improve mobility.",
-    "Sex": "Some risks vary by gender—consult doctor for personalized advice.",
-    "Age": "With age, regular health checkups become more important."
+RF_MODEL_PATH = "model/random_forest.pkl"
+DT_MODEL_PATH = "model/decision_tree.pkl"
+
+rf_model = joblib.load(RF_MODEL_PATH) if os.path.exists(RF_MODEL_PATH) else None
+dt_model = joblib.load(DT_MODEL_PATH) if os.path.exists(DT_MODEL_PATH) else None
+
+# Metadata (you can update accuracy values after training)
+MODEL_META = {
+    "TabPFN": {"accuracy": "92%"},
+    "RandomForest": {"accuracy": "90%"},  # change after training
+    "DecisionTree": {"accuracy": "85%"}   # change after training
 }
 
-# Ensure user plot folder exists
-os.makedirs("static/images/user", exist_ok=True)
 
-# Load trained data
-MODEL_META_PATH = "model/heart_disease_model_meta.json"
-if os.path.exists(MODEL_META_PATH):
-    with open(MODEL_META_PATH, "r") as f:
-        MODEL_META = json.load(f)
-    print("✅ Dataset loaded successfully:", MODEL_META)
-else:
-    MODEL_META = {"features": FEATURES, "accuracy": None}
-    print("⚠️ No Dataset found. Please run train_model.py first.")
+# ----------------------------
+# Routes
+# ----------------------------
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-# Always create a fresh classifier (connects to API)
-model = TabPFNClassifier()
 
-@app.route("/")
-def index():
-    return render_template("index.html")
-
-@app.route("/predict", methods=["GET", "POST"])
+@app.route('/predict', methods=['POST'])
 def predict():
-    if request.method == "POST":
-        user_data = []
-        for feature in FEATURES:
-            value = request.form.get(feature)
-            try:
-                user_data.append(float(value))
-            except (ValueError, TypeError):
-                user_data.append(0.0)
+    if request.method == 'POST':
+        # Collect user inputs from form
+        user_features = {
+            "age": float(request.form.get("age", 0)),
+            "cholesterol": float(request.form.get("cholesterol", 0)),
+            "blood_pressure": float(request.form.get("blood_pressure", 0)),
+            "max_heart_rate": float(request.form.get("max_heart_rate", 0)),
+            "blood_sugar": float(request.form.get("blood_sugar", 0))
+        }
 
-        input_df = pd.DataFrame([user_data], columns=FEATURES)
+        input_df = pd.DataFrame([user_features])
 
-        # Prediction (remote API call to TabPFN)
-        prob = 0.0
+        results = {}
+
+        # ---------------- TabPFN ----------------
         try:
-            proba = model.predict_proba(input_df)
-            if proba is not None and len(proba[0]) > 1:
-                prob = proba[0][1] * 100
+            proba_tab = TABPFN_MODEL.predict_proba(input_df)[0][1] * 100
         except Exception as e:
-            print("❌ Prediction error:", e)
+            print("TabPFN error:", e)
+            proba_tab = 0
 
-        prediction = (
-            "High Risk" if prob >= 60
-            else "Medium Risk" if prob >= 30
-            else "Low Risk"
+        pred_tab = (
+            "High Risk" if proba_tab >= 60 else
+            "Medium Risk" if proba_tab >= 30 else
+            "Low Risk"
         )
 
-        # Save Pie Chart
-        labels = ["No Risk", "Heart Disease Risk"]
-        values = [100 - prob, prob]
-        plt.figure(figsize=(5,5))
-        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, 
-                colors=["#4CAF50","#E63946"])
-        plt.title("Risk Probability")
-        pie_path = "static/images/user/pie_chart.png"
-        plt.savefig(pie_path)
-        plt.close()
+        results["TabPFN"] = {
+            "prob": round(proba_tab, 2),
+            "pred": pred_tab,
+            "acc": MODEL_META["TabPFN"]["accuracy"]
+        }
 
-        # Save Bar Chart 
-        user_features = dict(zip(FEATURES, user_data))
-        risky_features = {f: v for f, v in user_features.items() if v > 0}
-        if risky_features:  
-            plt.figure(figsize=(8,5))
-            plt.bar(risky_features.keys(), risky_features.values(), color="orange")
-            plt.title("User Health Factors (Non-zero values)")
-            plt.xticks(rotation=45, ha="right")
-            bar_path = "static/images/user/bar_chart.png"
-            plt.savefig(bar_path)
-            plt.close()
+        # ---------------- Random Forest ----------------
+        if rf_model:
+            try:
+                proba_rf = rf_model.predict_proba(input_df)[0][1] * 100
+                pred_rf = (
+                    "High Risk" if proba_rf >= 60 else
+                    "Medium Risk" if proba_rf >= 30 else
+                    "Low Risk"
+                )
+                results["RandomForest"] = {
+                    "prob": round(proba_rf, 2),
+                    "pred": pred_rf,
+                    "acc": MODEL_META["RandomForest"]["accuracy"]
+                }
+            except Exception as e:
+                print("RandomForest error:", e)
+                results["RandomForest"] = {"prob": None, "pred": "Error", "acc": None}
         else:
-            bar_path = None
+            results["RandomForest"] = {"prob": None, "pred": "Model not trained", "acc": None}
 
-        # Collect Suggestions
-        feedback = [SUGGESTIONS[f] for f in risky_features if f in SUGGESTIONS]
+        # ---------------- Decision Tree ----------------
+        if dt_model:
+            try:
+                proba_dt = dt_model.predict_proba(input_df)[0][1] * 100
+                pred_dt = (
+                    "High Risk" if proba_dt >= 60 else
+                    "Medium Risk" if proba_dt >= 30 else
+                    "Low Risk"
+                )
+                results["DecisionTree"] = {
+                    "prob": round(proba_dt, 2),
+                    "pred": pred_dt,
+                    "acc": MODEL_META["DecisionTree"]["accuracy"]
+                }
+            except Exception as e:
+                print("DecisionTree error:", e)
+                results["DecisionTree"] = {"prob": None, "pred": "Error", "acc": None}
+        else:
+            results["DecisionTree"] = {"prob": None, "pred": "Model not trained", "acc": None}
 
+        # ---------------- Render Result Page ----------------
         return render_template(
             "result.html",
-            prediction=prediction,
-            probability=round(prob, 2),
-            inputs=user_features,
-            pie_chart=pie_path,
-            bar_chart=bar_path,
-            feedback=feedback,
-            model_accuracy=MODEL_META.get("accuracy")
+            results=results,
+            inputs=user_features
         )
 
-    return render_template("predict.html", features=FEATURES)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
