@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Heart Disease AI Predictor</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -166,17 +167,14 @@
       color: white;
       margin-top: 40px;
     }
-      </style>
+  </style>
 </head>
 <body>
 
   <div class="hero">
     <div class="heart-icon">❤</div>
     <h1>Heart Disease AI Predictor</h1>
-    <p>
-      AI-powered tool to assess your heart disease risk<br> 
-      based on health and lifestyle factors.
-    </p>
+    <p>AI-powered tool to assess your heart disease risk<br> based on health and lifestyle factors.</p>
     <a href="{{ url_for('predict') }}" class="btn btn-start">Start Prediction</a>
 
     <div class="stats">
@@ -186,7 +184,7 @@
       </div>
       <div class="stat">
         <h3 id="accuracy">0%</h3>
-        <p>Best Model Accuracy</p>
+        <p>Model Accuracy</p>
       </div>
       <div class="stat">
         <h3 id="predictions">0</h3>
@@ -207,29 +205,17 @@
     </div>
   </div>
 
-  <!-- About Project -->
   <div class="section">
     <h2>About the Project</h2>
     <div class="container">
-      <p class="text-center" style="max-width: 900px; margin: auto; font-size: 18px; color: #555;">
-        This project leverages advanced <b>Machine Learning models</b> to analyze multiple health factors 
-        such as blood pressure, cholesterol, diabetes, and lifestyle habits.  
-        <br><br>
-        We use and compare three different AI models:
-        <ul style="text-align:left; max-width:700px; margin:20px auto; font-size: 17px; color: #333;">
-          <li><b>TabPFN Transformer</b> (state-of-the-art neural model)</li>
-          <li><b>Random Forest Classifier</b> (ensemble-based model)</li>
-          <li><b>Decision Tree Classifier</b> (tree-based model)</li>
-        </ul>
-        Each model generates detailed visualizations including <b>ROC curves, PCA scatter plots, Confusion Matrices, and Density plots</b> 
-        so you can clearly compare their strengths and accuracy.  
-        <br><br>
-        The system provides a detailed report on your heart disease risk, along with AI-powered recommendations for healthier living.
+      <p class="text-center" style="max-width: 800px; margin: auto; font-size: 18px; color: #555;">
+        This project leverages advanced <b>Machine Learning (TabPFN Transformer, Random Forest Classifier, Decision Tree Classifier)</b> models to analyze multiple health factors 
+        such as blood pressure, cholesterol, diabetes, and lifestyle habits. Each model generates detailed visualizations including <b>ROC curves, PCA scatter plots, Confusion Matrices, and Density plots</b> 
+        So you can clearly compare their strengths and accuracy. The system provides a detailed report on your heart disease risk, along with AI-powered recommendations for healthier living.
       </p>
     </div>
   </div>
 
-  <!-- Team -->
   <div class="section" style="background-color: #f7f9fc;">
     <h2>Meet Our Team (Group 81)</h2>
     <div class="container">
