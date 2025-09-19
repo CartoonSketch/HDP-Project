@@ -10,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 from tabpfn_client import TabPFNClassifier
 import os, json
-import joblib   # for saving sklearn models
+import joblib   
 
 def train_model():
     # Load Dataset
@@ -19,16 +19,16 @@ def train_model():
     X = df.drop("HeartDiseaseorAttack", axis=1)
     y = df["HeartDiseaseorAttack"]
 
-    # Split data
+    # Split dataset for training
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, random_state=42, stratify=y
     )
 
     os.makedirs("model", exist_ok=True)
 
-    # ========== 1. TabPFN (API) ==========
+    # TabPFN (API) 
     tabpfn = TabPFNClassifier()
-    print("🚀 Training TabPFN via API...")
+    print("Training TabPFN via API...")
     tabpfn.fit(X_train, y_train)
 
     y_pred_tab = tabpfn.predict(X_test)
@@ -36,15 +36,15 @@ def train_model():
     acc_tab = accuracy_score(y_test, y_pred_tab)
     print(f"✅ TabPFN Accuracy: {acc_tab:.2f}")
 
-    # Save TabPFN metadata (not pickled, API-based)
+    # Save TabPFN metadata 
     MODEL_META_TAB = {"features": list(X.columns), "accuracy": float(acc_tab)}
 
     with open("model/tabpfn_meta.json", "w") as f:
         json.dump(MODEL_META_TAB, f, indent=4)
 
-    # ========== 2. Random Forest ==========
+    # Random Forest 
     rf = RandomForestClassifier(random_state=42, n_estimators=200, max_depth=None)
-    print("🌲 Training Random Forest...")
+    print("Training Random Forest...")
     rf.fit(X_train, y_train)
 
     y_pred_rf = rf.predict(X_test)
@@ -54,9 +54,9 @@ def train_model():
 
     joblib.dump(rf, "model/random_forest.pkl")
 
-    # ========== 3. Decision Tree ==========
+    # Decision Tree
     dt = DecisionTreeClassifier(random_state=42, max_depth=None)
-    print("🌳 Training Decision Tree...")
+    print("Training Decision Tree...")
     dt.fit(X_train, y_train)
 
     y_pred_dt = dt.predict(X_test)
@@ -78,7 +78,6 @@ def train_model():
 
     print("💾 All models + metadata saved in /model")
 
-    # ---------- Plots (example: TabPFN ROC only now) ----------
     os.makedirs("static/images/analysis", exist_ok=True)
 
     # Confusion Matrix (TabPFN)
