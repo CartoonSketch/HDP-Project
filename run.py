@@ -10,6 +10,8 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from tabpfn_client import TabPFNClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 # Config paths
 DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv"
@@ -25,41 +27,64 @@ os.makedirs(ANALYSIS_PLOTS_DIR, exist_ok=True)
 
 # Load Dataset
 df = pd.read_csv(DATA_PATH)
-
-# Dataset rows calculation using TabPFN API
 if len(df) > MAX_ROWS:
-    print(f"⚠️ Dataset found with {len(df)} rows. So importing {len(df)} rows into TabPFN...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
 
 X = df.drop(TARGET, axis=1)
 y = df[TARGET]
-
 FEATURES = list(X.columns)
 
-# Train splited dataset
+# Split Dataset
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# Train TabPFN Model via API
-model = TabPFNClassifier()
-print("🤖 Training model using TabPFN API...")
-model.fit(X_train, y_train)
+# -----------------------------
+# Train TabPFN via API
+# -----------------------------
+tabpfn_model = TabPFNClassifier()
+print("🤖 Training TabPFN via API...")
+tabpfn_model.fit(X_train, y_train)
 
-# Predictions & Accuracy
-y_pred = model.predict(X_test)
-y_prob = model.predict_proba(X_test)[:, 1]
-accuracy = (y_pred == y_test).mean()
-print(f"✅ Model Accuracy: {accuracy:.2f}")
+y_pred_tabpfn = tabpfn_model.predict(X_test)
+y_prob_tabpfn = tabpfn_model.predict_proba(X_test)[:, 1]
+tabpfn_acc = (y_pred_tabpfn == y_test).mean()
+print(f"✅ TabPFN Accuracy: {tabpfn_acc:.2f}")
 
-# Save dataset
-MODEL_META = {"features": FEATURES, "accuracy": float(accuracy)}
+# -----------------------------
+# Train Random Forest Classifier
+# -----------------------------
+rf_model = RandomForestClassifier(random_state=42)
+rf_model.fit(X_train, y_train)
+rf_acc = rf_model.score(X_test, y_test)
+print(f"✅ Random Forest Accuracy: {rf_acc:.2f}")
+
+# -----------------------------
+# Train Decision Tree Classifier
+# -----------------------------
+dt_model = DecisionTreeClassifier(random_state=42)
+dt_model.fit(X_train, y_train)
+dt_acc = dt_model.score(X_test, y_test)
+print(f"✅ Decision Tree Accuracy: {dt_acc:.2f}")
+
+# -----------------------------
+# Save Model Meta
+# -----------------------------
+MODEL_META = {
+    "features": FEATURES,
+    "TabPFN_accuracy": float(tabpfn_acc),
+    "RandomForest_accuracy": float(rf_acc),
+    "DecisionTree_accuracy": float(dt_acc)
+}
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
-print(f"💾 Trained Dataset saved at {MODEL_META_PATH}")
+print(f"💾 Saved model meta to {MODEL_META_PATH}")
 
+# -----------------------------
+# Generate Plots (TabPFN Only)
+# -----------------------------
 # Confusion Matrix
-cm = confusion_matrix(y_test, y_pred)
+cm = confusion_matrix(y_test, y_pred_tabpfn)
 plt.figure(figsize=(6,5))
 sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
             xticklabels=["No Disease","Disease"],
@@ -71,7 +96,7 @@ plt.savefig(f"{ANALYSIS_PLOTS_DIR}/confusion_matrix.png")
 plt.close()
 
 # ROC Curve
-fpr, tpr, _ = roc_curve(y_test, y_prob)
+fpr, tpr, _ = roc_curve(y_test, y_prob_tabpfn)
 roc_auc = auc(fpr, tpr)
 plt.figure(figsize=(6,5))
 plt.plot(fpr, tpr, color="blue", lw=2, label=f"ROC Curve (AUC={roc_auc:.2f})")
@@ -104,9 +129,11 @@ for col in X.columns:
     plt.savefig(f"{ANALYSIS_PLOTS_DIR}/density_{col}.png")
     plt.close()
 
-print("📊 All Graph/plots analysis saved!")
+print("📊 All analysis plots saved!")
 
+# -----------------------------
 # Flask App
+# -----------------------------
 app = Flask(__name__)
 
 SUGGESTIONS = {
@@ -144,13 +171,35 @@ def predict():
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        prob = 0.0
-        try:
-            proba = model.predict_proba(input_df)
-            prob = proba[0][1]*100
-        except Exception as e:
-            print("❌ Prediction error:", e)
+        # -----------------------------
+        # Predictions for all models
+        # -----------------------------
+        results = {}
 
+        # TabPFN
+        try:
+            proba = tabpfn_model.predict_proba(input_df)
+            tabpfn_prob = proba[0][1]*100
+        except:
+            tabpfn_prob = 0.0
+        results["TabPFN"] = {"prob": tabpfn_prob, "accuracy": tabpfn_acc}
+
+        # Random Forest
+        try:
+            rf_prob = rf_model.predict_proba(input_df)[0][1]*100
+        except:
+            rf_prob = rf_model.predict(input_df)[0]*100
+        results["RandomForest"] = {"prob": rf_prob, "accuracy": rf_acc}
+
+        # Decision Tree
+        try:
+            dt_prob = dt_model.predict_proba(input_df)[0][1]*100
+        except:
+            dt_prob = dt_model.predict(input_df)[0]*100
+        results["DecisionTree"] = {"prob": dt_prob, "accuracy": dt_acc}
+
+        # Overall prediction using TabPFN prob (main)
+        prob = results["TabPFN"]["prob"]
         prediction = "High Risk" if prob>=60 else "Medium Risk" if prob>=30 else "Low Risk"
 
         # Pie Chart
@@ -187,11 +236,10 @@ def predict():
             pie_chart=pie_path,
             bar_chart=bar_path,
             feedback=feedback,
-            model_accuracy=accuracy
+            model_results=results
         )
 
     return render_template("predict.html", features=FEATURES)
 
-# Run Flask App
-if __name__ == "__main__":
+if __name__=="__main__":
     app.run(debug=True)
