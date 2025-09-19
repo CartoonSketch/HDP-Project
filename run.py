@@ -13,9 +13,7 @@ from tabpfn_client import TabPFNClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-# -----------------------------
 # Config paths
-# -----------------------------
 DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv"
 TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
@@ -29,9 +27,8 @@ os.makedirs(USER_PLOTS_DIR, exist_ok=True)
 for subdir in ["tabpfn", "randomforest", "tree"]:
     os.makedirs(f"{ANALYSIS_PLOTS_DIR}/{subdir}", exist_ok=True)
 
-# -----------------------------
+
 # Load dataset
-# -----------------------------
 df = pd.read_csv(DATA_PATH)
 if len(df) > MAX_ROWS:
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
@@ -40,14 +37,13 @@ X = df.drop(TARGET, axis=1)
 y = df[TARGET]
 FEATURES = list(X.columns)
 
-# Split dataset
+# Split dataset for training
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# -----------------------------
+
 # Initialize models
-# -----------------------------
 models = {
     "TabPFN": TabPFNClassifier(),
     "RandomForest": RandomForestClassifier(random_state=42),
@@ -58,9 +54,8 @@ model_results = {}
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# -----------------------------
+
 # Train each model & generate plots
-# -----------------------------
 for name, model in models.items():
     print(f"🤖 Training {name}...")
     model.fit(X_train, y_train)
@@ -78,7 +73,7 @@ for name, model in models.items():
     # Paths for this model
     plot_dir = f"{ANALYSIS_PLOTS_DIR}/{name.lower()}"
     
-    # 1️⃣ Confusion Matrix
+    # Confusion Matrix
     cm = confusion_matrix(y_test, y_pred)
     plt.figure(figsize=(6,5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
@@ -91,7 +86,7 @@ for name, model in models.items():
     plt.savefig(cm_path)
     plt.close()
     
-    # 2️⃣ ROC Curve
+    # ROC Curve
     fpr, tpr, _ = roc_curve(y_test, y_prob)
     roc_auc = auc(fpr, tpr)
     plt.figure(figsize=(6,5))
@@ -105,7 +100,7 @@ for name, model in models.items():
     plt.savefig(roc_path)
     plt.close()
     
-    # 3️⃣ PCA Scatter
+    # PCA Scatter
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X_scaled)
     plt.figure(figsize=(7,6))
@@ -117,7 +112,7 @@ for name, model in models.items():
     plt.savefig(pca_path)
     plt.close()
     
-    # 4️⃣ Density Plots
+    # Density Plots
     density_paths = {}
     for col in X.columns:
         plt.figure(figsize=(6,4))
@@ -126,10 +121,9 @@ for name, model in models.items():
         density_path = f"{plot_dir}/density_{col}.png"
         plt.savefig(density_path)
         plt.close()
-        # Save relative path for template
         density_paths[col] = density_path.replace("static/", "")
     
-    # Save results for template (relative paths)
+    # Save results for template 
     model_results[name] = {
         "accuracy": round(acc*100,2),
         "confusion_matrix": cm_path.replace("static/", ""),
@@ -138,17 +132,15 @@ for name, model in models.items():
         "density": density_paths
     }
 
-# -----------------------------
+
 # Save Model Meta
-# -----------------------------
 MODEL_META = {**{f"{name}_accuracy": model_results[name]["accuracy"] for name in model_results}}
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
 print("💾 Saved model meta.")
 
-# -----------------------------
+
 # Flask App
-# -----------------------------
 app = Flask(__name__)
 
 SUGGESTIONS = {
@@ -202,7 +194,7 @@ def predict():
                 "density": model_results[name]["density"]
             }
 
-        # Overall prediction using TabPFN prob
+        # Overall prediction using TabPFN
         prob = results["TabPFN"]["prob"]
         prediction = "High Risk" if prob>=60 else "Medium Risk" if prob>=30 else "Low Risk"
 
