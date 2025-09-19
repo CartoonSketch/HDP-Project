@@ -194,30 +194,33 @@
           </tr>
         </thead>
         <tbody>
-          {% for model, data in results.items() %}
+          {% for model, data in model_results.items() %}
           <tr>
             <td><b>{{ model }}</b></td>
             <td style="color:
-                {% if data.pred == 'High Risk' %}red
-                {% elif data.pred == 'Medium Risk' %}orange
+                {% if data.prob >= 60 %}red
+                {% elif data.prob >= 30 %}orange
                 {% else %}green
                 {% endif %};
-            ">{{ data.pred }}</td>
-            <td>
-              {% if data.prob %}
-                <div class="progress-container">
-                  <div class="progress-bar" style="width: {{ data.prob }}%; 
-                      background:
-                      {% if data.pred == 'High Risk' %}red
-                      {% elif data.pred == 'Medium Risk' %}orange
-                      {% else %}green
-                      {% endif %};">
-                      {{ data.prob }}%
-                  </div>
-                </div>
-              {% else %} N/A {% endif %}
+            ">
+              {% if data.prob >= 60 %}High Risk
+              {% elif data.prob >= 30 %}Medium Risk
+              {% else %}Low Risk
+              {% endif %}
             </td>
-            <td>{{ data.acc if data.acc else "N/A" }}</td>
+            <td>
+              <div class="progress-container">
+                <div class="progress-bar" style="width: {{ data.prob }}%; 
+                    background:
+                    {% if data.prob >= 60 %}red
+                    {% elif data.prob >= 30 %}orange
+                    {% else %}green
+                    {% endif %};">
+                    {{ data.prob | round(2) }}%
+                </div>
+              </div>
+            </td>
+            <td>{{ data.accuracy | round(2) if data.accuracy else "N/A" }}</td>
           </tr>
           {% endfor %}
         </tbody>
@@ -312,4 +315,4 @@
   </div>
 
 </body>
-                  </html>
+  </html>
