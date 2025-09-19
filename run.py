@@ -13,7 +13,9 @@ from tabpfn_client import TabPFNClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+# -----------------------------
 # Config paths
+# -----------------------------
 DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv"
 TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
@@ -21,11 +23,15 @@ USER_PLOTS_DIR = "static/images/user"
 ANALYSIS_PLOTS_DIR = "static/images/analysis"
 MAX_ROWS = 10000
 
+# Create directories
 os.makedirs("model", exist_ok=True)
 os.makedirs(USER_PLOTS_DIR, exist_ok=True)
-os.makedirs(ANALYSIS_PLOTS_DIR, exist_ok=True)
+for subdir in ["tabpfn", "randomforest", "tree"]:
+    os.makedirs(f"{ANALYSIS_PLOTS_DIR}/{subdir}", exist_ok=True)
 
-# Load Dataset
+# -----------------------------
+# Load dataset
+# -----------------------------
 df = pd.read_csv(DATA_PATH)
 if len(df) > MAX_ROWS:
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
@@ -34,102 +40,110 @@ X = df.drop(TARGET, axis=1)
 y = df[TARGET]
 FEATURES = list(X.columns)
 
-# Split Dataset
+# Split dataset
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
 # -----------------------------
-# Train TabPFN via API
+# Initialize models
 # -----------------------------
-tabpfn_model = TabPFNClassifier()
-print("🤖 Training TabPFN via API...")
-tabpfn_model.fit(X_train, y_train)
+models = {
+    "TabPFN": TabPFNClassifier(),
+    "RandomForest": RandomForestClassifier(random_state=42),
+    "DecisionTree": DecisionTreeClassifier(random_state=42)
+}
 
-y_pred_tabpfn = tabpfn_model.predict(X_test)
-y_prob_tabpfn = tabpfn_model.predict_proba(X_test)[:, 1]
-tabpfn_acc = (y_pred_tabpfn == y_test).mean()
-print(f"✅ TabPFN Accuracy: {tabpfn_acc:.2f}")
-
-# -----------------------------
-# Train Random Forest Classifier
-# -----------------------------
-rf_model = RandomForestClassifier(random_state=42)
-rf_model.fit(X_train, y_train)
-rf_acc = rf_model.score(X_test, y_test)
-print(f"✅ Random Forest Accuracy: {rf_acc:.2f}")
+model_results = {}
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
 
 # -----------------------------
-# Train Decision Tree Classifier
+# Train each model & generate plots
 # -----------------------------
-dt_model = DecisionTreeClassifier(random_state=42)
-dt_model.fit(X_train, y_train)
-dt_acc = dt_model.score(X_test, y_test)
-print(f"✅ Decision Tree Accuracy: {dt_acc:.2f}")
+for name, model in models.items():
+    print(f"🤖 Training {name}...")
+    model.fit(X_train, y_train)
+    
+    # Predictions & Probabilities
+    y_pred = model.predict(X_test)
+    try:
+        y_prob = model.predict_proba(X_test)[:,1]
+    except:
+        y_prob = np.zeros(len(y_test))
+    
+    acc = (y_pred == y_test).mean()
+    print(f"✅ {name} Accuracy: {acc:.2f}")
+    
+    # Paths for this model
+    plot_dir = f"{ANALYSIS_PLOTS_DIR}/{name.lower()}"
+    
+    # 1️⃣ Confusion Matrix
+    cm = confusion_matrix(y_test, y_pred)
+    plt.figure(figsize=(6,5))
+    sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
+                xticklabels=["No Disease","Disease"],
+                yticklabels=["No Disease","Disease"])
+    plt.title(f"{name} Confusion Matrix")
+    plt.ylabel("Actual")
+    plt.xlabel("Predicted")
+    cm_path = f"{plot_dir}/confusion_matrix.png"
+    plt.savefig(cm_path)
+    plt.close()
+    
+    # 2️⃣ ROC Curve
+    fpr, tpr, _ = roc_curve(y_test, y_prob)
+    roc_auc = auc(fpr, tpr)
+    plt.figure(figsize=(6,5))
+    plt.plot(fpr, tpr, color="blue", lw=2, label=f"AUC={roc_auc:.2f}")
+    plt.plot([0,1],[0,1], color="red", linestyle="--")
+    plt.xlabel("False Positive Rate")
+    plt.ylabel("True Positive Rate")
+    plt.title(f"{name} ROC Curve")
+    plt.legend(loc="lower right")
+    roc_path = f"{plot_dir}/roc_curve.png"
+    plt.savefig(roc_path)
+    plt.close()
+    
+    # 3️⃣ PCA Scatter
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X_scaled)
+    plt.figure(figsize=(7,6))
+    sns.scatterplot(x=X_pca[:,0], y=X_pca[:,1], hue=y, palette="Set1", alpha=0.7)
+    plt.title(f"{name} PCA Scatter")
+    plt.xlabel("PC1")
+    plt.ylabel("PC2")
+    pca_path = f"{plot_dir}/pca_scatter.png"
+    plt.savefig(pca_path)
+    plt.close()
+    
+    # 4️⃣ Density Plots
+    density_paths = {}
+    for col in X.columns:
+        plt.figure(figsize=(6,4))
+        sns.kdeplot(data=df, x=col, hue=TARGET, fill=True, common_norm=False, palette="Set1", alpha=0.6)
+        plt.title(f"{name} Density - {col}")
+        density_path = f"{plot_dir}/density_{col}.png"
+        plt.savefig(density_path)
+        plt.close()
+        density_paths[col] = density_path
+    
+    # Save results for template
+    model_results[name] = {
+        "accuracy": round(acc*100,2),
+        "confusion_matrix": cm_path,
+        "roc_curve": roc_path,
+        "pca_scatter": pca_path,
+        "density": density_paths
+    }
 
 # -----------------------------
 # Save Model Meta
 # -----------------------------
-MODEL_META = {
-    "features": FEATURES,
-    "TabPFN_accuracy": float(tabpfn_acc),
-    "RandomForest_accuracy": float(rf_acc),
-    "DecisionTree_accuracy": float(dt_acc)
-}
+MODEL_META = {**{f"{name}_accuracy": model_results[name]["accuracy"] for name in model_results}}
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
-print(f"💾 Saved model meta to {MODEL_META_PATH}")
-
-# -----------------------------
-# Generate Plots (TabPFN Only)
-# -----------------------------
-# Confusion Matrix
-cm = confusion_matrix(y_test, y_pred_tabpfn)
-plt.figure(figsize=(6,5))
-sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
-            xticklabels=["No Disease","Disease"],
-            yticklabels=["No Disease","Disease"])
-plt.title("Confusion Matrix")
-plt.ylabel("Actual")
-plt.xlabel("Predicted")
-plt.savefig(f"{ANALYSIS_PLOTS_DIR}/confusion_matrix.png")
-plt.close()
-
-# ROC Curve
-fpr, tpr, _ = roc_curve(y_test, y_prob_tabpfn)
-roc_auc = auc(fpr, tpr)
-plt.figure(figsize=(6,5))
-plt.plot(fpr, tpr, color="blue", lw=2, label=f"ROC Curve (AUC={roc_auc:.2f})")
-plt.plot([0,1],[0,1], color="red", linestyle="--")
-plt.xlabel("False Positive Rate")
-plt.ylabel("True Positive Rate")
-plt.title("ROC Curve")
-plt.legend(loc="lower right")
-plt.savefig(f"{ANALYSIS_PLOTS_DIR}/roc_curve.png")
-plt.close()
-
-# PCA Scatter
-scaler = StandardScaler()
-X_scaled = scaler.fit_transform(X)
-pca = PCA(n_components=2)
-X_pca = pca.fit_transform(X_scaled)
-plt.figure(figsize=(7,6))
-sns.scatterplot(x=X_pca[:,0], y=X_pca[:,1], hue=y, palette="Set1", alpha=0.7)
-plt.title("PCA of Features")
-plt.xlabel("PC1")
-plt.ylabel("PC2")
-plt.savefig(f"{ANALYSIS_PLOTS_DIR}/pca_scatter.png")
-plt.close()
-
-# Density Plots
-for col in X.columns:
-    plt.figure(figsize=(6,4))
-    sns.kdeplot(data=df, x=col, hue=TARGET, fill=True, common_norm=False, palette="Set1", alpha=0.6)
-    plt.title(f"Density Plot - {col}")
-    plt.savefig(f"{ANALYSIS_PLOTS_DIR}/density_{col}.png")
-    plt.close()
-
-print("📊 All analysis plots saved!")
+print("💾 Saved model meta.")
 
 # -----------------------------
 # Flask App
@@ -171,34 +185,23 @@ def predict():
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        # -----------------------------
         # Predictions for all models
-        # -----------------------------
         results = {}
+        for name, model in models.items():
+            try:
+                prob = model.predict_proba(input_df)[0][1]*100
+            except:
+                prob = model.predict(input_df)[0]*100
+            results[name] = {
+                "prob": round(prob,2),
+                "accuracy": model_results[name]["accuracy"],
+                "confusion_matrix": model_results[name]["confusion_matrix"],
+                "roc_curve": model_results[name]["roc_curve"],
+                "pca_scatter": model_results[name]["pca_scatter"],
+                "density": model_results[name]["density"]
+            }
 
-        # TabPFN
-        try:
-            proba = tabpfn_model.predict_proba(input_df)
-            tabpfn_prob = proba[0][1]*100
-        except:
-            tabpfn_prob = 0.0
-        results["TabPFN"] = {"prob": tabpfn_prob, "accuracy": tabpfn_acc}
-
-        # Random Forest
-        try:
-            rf_prob = rf_model.predict_proba(input_df)[0][1]*100
-        except:
-            rf_prob = rf_model.predict(input_df)[0]*100
-        results["RandomForest"] = {"prob": rf_prob, "accuracy": rf_acc}
-
-        # Decision Tree
-        try:
-            dt_prob = dt_model.predict_proba(input_df)[0][1]*100
-        except:
-            dt_prob = dt_model.predict(input_df)[0]*100
-        results["DecisionTree"] = {"prob": dt_prob, "accuracy": dt_acc}
-
-        # Overall prediction using TabPFN prob (main)
+        # Overall prediction using TabPFN prob
         prob = results["TabPFN"]["prob"]
         prediction = "High Risk" if prob>=60 else "Medium Risk" if prob>=30 else "Low Risk"
 
