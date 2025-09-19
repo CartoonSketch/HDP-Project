@@ -6,9 +6,8 @@ from tabpfn import TabPFNClassifier  # TabPFN API
 
 app = Flask(__name__)
 
-# ----------------------------
+
 # Load Models
-# ----------------------------
 TABPFN_MODEL = TabPFNClassifier(device="cpu")
 
 RF_MODEL_PATH = "model/random_forest.pkl"
@@ -17,17 +16,16 @@ DT_MODEL_PATH = "model/decision_tree.pkl"
 rf_model = joblib.load(RF_MODEL_PATH) if os.path.exists(RF_MODEL_PATH) else None
 dt_model = joblib.load(DT_MODEL_PATH) if os.path.exists(DT_MODEL_PATH) else None
 
-# Metadata (you can update accuracy values after training)
+# Metadata 
 MODEL_META = {
     "TabPFN": {"accuracy": "92%"},
-    "RandomForest": {"accuracy": "90%"},  # change after training
-    "DecisionTree": {"accuracy": "85%"}   # change after training
+    "RandomForest": {"accuracy": "90%"}, 
+    "DecisionTree": {"accuracy": "85%"}   
 }
 
 
-# ----------------------------
+
 # Routes
-# ----------------------------
 @app.route('/')
 def home():
     return render_template('index.html')
@@ -49,7 +47,7 @@ def predict():
 
         results = {}
 
-        # ---------------- TabPFN ----------------
+        # TabPFN
         try:
             proba_tab = TABPFN_MODEL.predict_proba(input_df)[0][1] * 100
         except Exception as e:
@@ -68,7 +66,7 @@ def predict():
             "acc": MODEL_META["TabPFN"]["accuracy"]
         }
 
-        # ---------------- Random Forest ----------------
+        # Random Forest 
         if rf_model:
             try:
                 proba_rf = rf_model.predict_proba(input_df)[0][1] * 100
@@ -88,7 +86,7 @@ def predict():
         else:
             results["RandomForest"] = {"prob": None, "pred": "Model not trained", "acc": None}
 
-        # ---------------- Decision Tree ----------------
+        # Decision Tree 
         if dt_model:
             try:
                 proba_dt = dt_model.predict_proba(input_df)[0][1] * 100
@@ -108,7 +106,7 @@ def predict():
         else:
             results["DecisionTree"] = {"prob": None, "pred": "Model not trained", "acc": None}
 
-        # ---------------- Render Result Page ----------------
+        # Result Page 
         return render_template(
             "result.html",
             results=results,
