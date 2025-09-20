@@ -207,7 +207,8 @@
 
       <!-- Density Plots -->
       <h4 class="text-center mt-3">Density Plots</h4>
-      {% for col in data.density.keys() %}
+      {% set first_model = model_results.values()|list|first %}
+      {% for col in first_model.density.keys() %}
       <h5 class="mt-2">{{ col }}</h5>
       <div class="analysis-charts">
         {% for model, data in model_results.items() %}
@@ -232,4 +233,4 @@
   </div>
 
 </body>
-</html>
+  </html>
