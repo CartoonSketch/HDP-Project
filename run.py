@@ -47,6 +47,7 @@ for sub in SUBDIR_MAP.values():
 # -----------------------------
 df = pd.read_csv(DATA_PATH)
 if len(df) > MAX_ROWS:
+    print(f"⚠️ Dataset found with {len(df)} rows. So importing {len(df)} them for Training...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
 
 X = df.drop(TARGET, axis=1)
