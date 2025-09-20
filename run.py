@@ -116,8 +116,8 @@ for name, model in models.items():
         fpr, tpr, roc_auc = [0, 1], [0, 1], 0.0
 
     plt.figure(figsize=(6, 5))
-    plt.plot(fpr, tpr, lw=2, label=f"AUC={roc_auc:.2f}")
-    plt.plot([0, 1], [0, 1], linestyle="--")
+    plt.plot(fpr, tpr, color="blue", lw=2, label=f"AUC={roc_auc:.2f}")
+    plt.plot([0, 1], [0, 1], color="red", linestyle="--")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
     plt.title(f"{name} ROC Curve")
@@ -248,7 +248,7 @@ def predict():
         labels = ["No Risk", "Heart Disease Risk"]
         values = [100 - prob_main, prob_main]
         plt.figure(figsize=(5, 5))
-        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90)
+        plt.pie(values, labels=labels, autopct="%1.1f%%", startangle=90, colors=["#4CAF50","#E63946"])
         plt.title("Risk Probability")
         pie_path = os.path.join(USER_PLOTS_DIR, "pie_chart.png")
         plt.tight_layout()
@@ -260,7 +260,7 @@ def predict():
         risky_features = {f: v for f, v in user_features.items() if (isinstance(v, (int, float)) and v > 0)}
         if risky_features:
             plt.figure(figsize=(8, 5))
-            plt.bar(list(risky_features.keys()), list(risky_features.values()))
+            plt.bar(list(risky_features.keys()), list(risky_features.values()), color="orange")
             plt.title("User Health Factors (Non-zero)")
             plt.xticks(rotation=45, ha="right")
             bar_path = os.path.join(USER_PLOTS_DIR, "bar_chart.png")
