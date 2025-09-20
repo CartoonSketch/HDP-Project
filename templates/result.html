@@ -141,7 +141,7 @@
 
     <!-- Side-by-Side Model Analysis -->
     <div class="card">
-      <h3 class="text-center">Side-by-Side Model Comparison</h3>
+      <h3 class="text-center">Model Comparison</h3>
 
       <!-- Confusion Matrices -->
       <h4 class="text-center mt-3">Confusion Matrices</h4>
@@ -195,8 +195,11 @@
       </div>
 
       <!-- Density Plots -->
-      <h4 class="text-center mt-3">Density Plots</h4>
-      {% set features = ['HighBP', 'HighChol', 'CholCheck', 'BMI', 'Smoker', 'Stroke', 'Diabetes', 'HeartDisease'] %}
+      <h4 class="text-center mt-3">Density Plots Comparison</h4>
+      {% set features = [
+          'Age','AnyHealthcare','BMI','CholCheck','Diabetes','DiffWalk',
+          'Fruits','GenHlth','HighBP','HighChol','HvyAlcoholConsump',
+          'NoDocbcCost','PhysActivity','PhysHlth','Sex','Smoker','Stroke','Veggies'] %}
       {% for feature in features %}
       <h5 class="mt-2">{{ feature }}</h5>
       <div class="analysis-charts">
