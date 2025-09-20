@@ -15,7 +15,6 @@ import joblib
 def train_model():
     # Load Dataset
     df = pd.read_csv("data/HEART_DISEASE_PREDICTION_DATASET.csv")
-
     X = df.drop("HeartDiseaseorAttack", axis=1)
     y = df["HeartDiseaseorAttack"]
 
@@ -76,11 +75,11 @@ def train_model():
     with open("model/models_meta.json", "w") as f:
         json.dump(META, f, indent=4)
 
-    print("💾 All models + metadata saved in /model")
+    print("💾 All models saved in /model")
 
     os.makedirs("static/images/analysis", exist_ok=True)
 
-    # Confusion Matrix (TabPFN)
+    # Confusion Matrix Comparison
     cm = confusion_matrix(y_test, y_pred_tab)
     plt.figure(figsize=(6,5))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues",
