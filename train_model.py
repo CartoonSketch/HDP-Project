@@ -98,9 +98,9 @@ def train_model():
     fpr_dt, tpr_dt, _ = roc_curve(y_test, y_prob_dt)
 
     plt.figure(figsize=(7,6))
-    plt.plot(fpr_tab, tpr_tab, label=f"TabPFN (AUC={auc(fpr_tab,tpr_tab):.2f})", lw=2)
-    plt.plot(fpr_rf, tpr_rf, label=f"Random Forest (AUC={auc(fpr_rf,tpr_rf):.2f})", lw=2)
-    plt.plot(fpr_dt, tpr_dt, label=f"Decision Tree (AUC={auc(fpr_dt,tpr_dt):.2f})", lw=2)
+    plt.plot(fpr_tab, tpr_tab, color="blue", label=f"TabPFN (AUC={auc(fpr_tab,tpr_tab):.2f})", lw=2)
+    plt.plot(fpr_rf, tpr_rf, color="blue", label=f"Random Forest (AUC={auc(fpr_rf,tpr_rf):.2f})", lw=2)
+    plt.plot(fpr_dt, tpr_dt, color="blue", label=f"Decision Tree (AUC={auc(fpr_dt,tpr_dt):.2f})", lw=2)
     plt.plot([0,1], [0,1], linestyle="--", color="red")
     plt.xlabel("False Positive Rate")
     plt.ylabel("True Positive Rate")
