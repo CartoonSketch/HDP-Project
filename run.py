@@ -1,15 +1,11 @@
-# run.py (updated)
 import os
 import json
 import pandas as pd
 import numpy as np
-
-# Use non-interactive backend for matplotlib (prevents GUI warnings)
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
-
 from flask import Flask, render_template, request
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import confusion_matrix, roc_curve, auc
@@ -19,9 +15,7 @@ from tabpfn_client import TabPFNClassifier
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.tree import DecisionTreeClassifier
 
-# -----------------------------
 # Config paths
-# -----------------------------
 DATA_PATH = "data/HEART_DISEASE_PREDICTION_DATASET.csv"
 TARGET = "HeartDiseaseorAttack"
 MODEL_META_PATH = "model/heart_disease_model_meta.json"
@@ -29,11 +23,11 @@ USER_PLOTS_DIR = "static/images/user"
 ANALYSIS_PLOTS_DIR = "static/images/analysis"
 MAX_ROWS = 10000
 
-# Create directories (ensures consistent subfolder names)
+# Create directories 
 os.makedirs("model", exist_ok=True)
 os.makedirs(USER_PLOTS_DIR, exist_ok=True)
 
-# canonical subdir mapping for each model name
+# Canonical subdir 
 SUBDIR_MAP = {
     "TabPFN": "tabpfn",
     "RandomForest": "randomforest",
@@ -42,12 +36,11 @@ SUBDIR_MAP = {
 for sub in SUBDIR_MAP.values():
     os.makedirs(os.path.join(ANALYSIS_PLOTS_DIR, sub), exist_ok=True)
 
-# -----------------------------
+
 # Load dataset
-# -----------------------------
 df = pd.read_csv(DATA_PATH)
 if len(df) > MAX_ROWS:
-    print(f"⚠️ Dataset found with {len(df)} rows. So importing {len(df)} them for Training...")
+    print(f"⚠️ Dataset found with {len(df)} rows...")
     df = df.sample(n=MAX_ROWS, random_state=42).reset_index(drop=True)
 
 X = df.drop(TARGET, axis=1)
@@ -59,9 +52,8 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# -----------------------------
+
 # Initialize models
-# -----------------------------
 models = {
     "TabPFN": TabPFNClassifier(),
     "RandomForest": RandomForestClassifier(random_state=42),
@@ -72,9 +64,8 @@ model_results = {}
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-# -----------------------------
+
 # Train each model & generate plots
-# -----------------------------
 for name, model in models.items():
     print(f"🤖 Training {name}...")
     model.fit(X_train, y_train)
@@ -84,7 +75,6 @@ for name, model in models.items():
     try:
         y_prob = model.predict_proba(X_test)[:, 1]
     except Exception:
-        # Fallback if model does not implement predict_proba
         y_prob = np.zeros(len(y_test))
 
     acc = (y_pred == y_test).mean()
@@ -108,12 +98,11 @@ for name, model in models.items():
     plt.savefig(cm_path)
     plt.close()
 
-    # 2) ROC Curve (if probabilities available)
+    # 2) ROC Curve 
     try:
         fpr, tpr, _ = roc_curve(y_test, y_prob)
         roc_auc = auc(fpr, tpr)
     except Exception:
-        # fallback values for plotting (empty ROC)
         fpr, tpr, roc_auc = [0, 1], [0, 1], 0.0
 
     plt.figure(figsize=(6, 5))
@@ -128,7 +117,7 @@ for name, model in models.items():
     plt.savefig(roc_path)
     plt.close()
 
-    # 3) PCA Scatter (same PCA visualization for all models but labelled per model)
+    # 3) PCA Scatter 
     pca = PCA(n_components=2)
     X_pca = pca.fit_transform(X_scaled)
     plt.figure(figsize=(7, 6))
@@ -141,16 +130,14 @@ for name, model in models.items():
     plt.savefig(pca_path)
     plt.close()
 
-    # 4) Density Plots (one per feature)
+    # 4) Density Plots 
     density_paths = {}
     for col in X.columns:
         plt.figure(figsize=(6, 4))
-        # if column is non-numeric this will fail; assuming dataset matches your existing form
         try:
             sns.kdeplot(data=df, x=col, hue=TARGET, fill=True, common_norm=False, palette="Set1", alpha=0.6)
             plt.title(f"{name} Density - {col}")
         except Exception:
-            # fallback: simple histogram if KDE fails
             plt.hist([df[df[TARGET] == 0][col].dropna(), df[df[TARGET] == 1][col].dropna()], bins=20, label=["No Disease", "Disease"])
             plt.legend()
             plt.title(f"{name} Density/Hist - {col}")
@@ -158,10 +145,9 @@ for name, model in models.items():
         plt.tight_layout()
         plt.savefig(density_path)
         plt.close()
-        # store path relative to static/ for url_for usage
         density_paths[col] = os.path.join("images", "analysis", subdir, f"density_{col}.png")
 
-    # store all saved plot paths (relative to static/)
+    # store all saved plot paths
     model_results[name] = {
         "accuracy": round(acc * 100, 2),
         "confusion_matrix": os.path.join("images", "analysis", subdir, "confusion_matrix.png"),
@@ -170,18 +156,16 @@ for name, model in models.items():
         "density": density_paths
     }
 
-# -----------------------------
+
 # Save Model Meta
-# -----------------------------
 MODEL_META = {f"{name}_accuracy": model_results[name]["accuracy"] for name in model_results}
 os.makedirs(os.path.dirname(MODEL_META_PATH), exist_ok=True)
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
 print("💾 Saved model meta.")
 
-# -----------------------------
+
 # Flask App
-# -----------------------------
 app = Flask(__name__)
 
 SUGGESTIONS = {
@@ -206,7 +190,6 @@ SUGGESTIONS = {
 
 @app.route("/")
 def index():
-    # You can pass global numbers here to show on index (patients, accuracy, etc.)
     global_accuracy = round(np.mean([v["accuracy"] for v in model_results.values()]), 2)
     return render_template("index.html", global_accuracy=global_accuracy)
 
@@ -223,13 +206,12 @@ def predict():
 
         input_df = pd.DataFrame([user_data], columns=FEATURES)
 
-        # Predictions for all models (return per-model probability + pre-generated analysis plots)
+        # Predictions for all models 
         results = {}
         for name, model in models.items():
             try:
                 prob = model.predict_proba(input_df)[0][1] * 100
             except Exception:
-                # If predict_proba not available, fall back to predict (0/1)
                 pred_val = model.predict(input_df)[0]
                 prob = float(pred_val) * 100
             results[name] = {
@@ -241,11 +223,11 @@ def predict():
                 "density": model_results[name]["density"]
             }
 
-        # Overall prediction using TabPFN (you can change aggregation if desired)
+        # Overall prediction 
         prob_main = results["TabPFN"]["prob"]
         prediction = "High Risk" if prob_main >= 60 else "Medium Risk" if prob_main >= 30 else "Low Risk"
 
-        # Pie Chart (user)
+        # Pie Chart
         labels = ["No Risk", "Heart Disease Risk"]
         values = [100 - prob_main, prob_main]
         plt.figure(figsize=(5, 5))
@@ -256,7 +238,7 @@ def predict():
         plt.savefig(pie_path)
         plt.close()
 
-        # Bar Chart of user's non-zero features
+        # Bar Chart 
         user_features = dict(zip(FEATURES, user_data))
         risky_features = {f: v for f, v in user_features.items() if (isinstance(v, (int, float)) and v > 0)}
         if risky_features:
@@ -285,7 +267,7 @@ def predict():
             pie_chart=pie_path_rel,
             bar_chart=bar_path_rel,
             feedback=feedback,
-            model_results=results  # this contains per-model prob/accuracy + analysis paths (relative to static/)
+            model_results=results  
         )
 
     return render_template("predict.html", features=FEATURES)
