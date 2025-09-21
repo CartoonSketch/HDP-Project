@@ -24,13 +24,8 @@ Users can provide their health information through a **user-friendly web form**,
 
 - The dataset contains 2 lakh+ Rows
 - The dataset contains 20 factors related to heart health
-- HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruits, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, PhysHlth, DiffWalk, Sex, Age
+- Such as: HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruits, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, PhysHlth, DiffWalk, Sex, Age
 - All categorical/binary factors are converted to 0/1 for ML modeling.
-
-- Numeric thresholds:
-Age > 50 → 1, else 0
-BMI > 30 → 1, else 0
-PhysHlth > 10 days → 1, else 0
 
 ## Machine Learning (ML) Model Used
 
