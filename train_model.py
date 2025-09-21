@@ -33,7 +33,7 @@ def train_model():
     y_pred_tab = tabpfn.predict(X_test)
     y_prob_tab = tabpfn.predict_proba(X_test)[:, 1]
     acc_tab = accuracy_score(y_test, y_pred_tab)
-    print(f"✅ TabPFN Accuracy: {acc_tab:.2f}")
+    print(f"✅ TabPFN Model Trained with Accuracy: {acc_tab:.2f}")
 
     # Save TabPFN metadata 
     MODEL_META_TAB = {"features": list(X.columns), "accuracy": float(acc_tab)}
@@ -43,25 +43,25 @@ def train_model():
 
     # Random Forest 
     rf = RandomForestClassifier(random_state=42, n_estimators=200, max_depth=None)
-    print("Training Random Forest...")
+    print("Training Random Forest Model...")
     rf.fit(X_train, y_train)
 
     y_pred_rf = rf.predict(X_test)
     y_prob_rf = rf.predict_proba(X_test)[:, 1]
     acc_rf = accuracy_score(y_test, y_pred_rf)
-    print(f"✅ Random Forest Accuracy: {acc_rf:.2f}")
+    print(f"✅ Random Forest Model Trained with Accuracy: {acc_rf:.2f}")
 
     joblib.dump(rf, "model/random_forest.pkl")
 
     # Decision Tree
     dt = DecisionTreeClassifier(random_state=42, max_depth=None)
-    print("Training Decision Tree...")
+    print("Training Decision Tree Model...")
     dt.fit(X_train, y_train)
 
     y_pred_dt = dt.predict(X_test)
     y_prob_dt = dt.predict_proba(X_test)[:, 1]
     acc_dt = accuracy_score(y_test, y_pred_dt)
-    print(f"✅ Decision Tree Accuracy: {acc_dt:.2f}")
+    print(f"✅ Decision Tree Model Trained with Accuracy: {acc_dt:.2f}")
 
     joblib.dump(dt, "model/decision_tree.pkl")
 
