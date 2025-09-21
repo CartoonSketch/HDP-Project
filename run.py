@@ -67,7 +67,7 @@ X_scaled = scaler.fit_transform(X)
 
 # Train each model & generate plots
 for name, model in models.items():
-    print(f"🤖 Training {name}...")
+    print(f"🤖 Training {name} Model...")
     model.fit(X_train, y_train)
 
     # Predictions & Probabilities
@@ -78,7 +78,7 @@ for name, model in models.items():
         y_prob = np.zeros(len(y_test))
 
     acc = (y_pred == y_test).mean()
-    print(f"✅ {name} Accuracy: {acc:.4f}")
+    print(f"✅ {name} Model Trained with Accuracy: {acc:.4f}")
 
     # subdir for this model
     subdir = SUBDIR_MAP.get(name, name.lower())
@@ -162,7 +162,9 @@ MODEL_META = {f"{name}_accuracy": model_results[name]["accuracy"] for name in mo
 os.makedirs(os.path.dirname(MODEL_META_PATH), exist_ok=True)
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
-print("💾 Saved model meta.")
+print("✅ All Models Trained Successfully!")
+print("💾 Saving All Trained Models...")
+print("✅ All Trained Models Saved in /model")
 
 
 # Flask App
