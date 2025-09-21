@@ -5,7 +5,7 @@ The Heart Disease AI Predictor is a machine learning-based web application built
 Users can provide their health information through a **user-friendly web form**, and the application will return a **risk prediction** along with the **probability percentage** and **model accuracy**.
 
 ## Features
-- Predicts heart disease risk using 3 different models **TabPFN, RandomForest, DecisionTree**
+- Predicts heart disease risk using 3 different models **(TabPFN, RandomForest, DecisionTree)**
 - User-friendly web interface with **20 health-related questions**
 - Displays prediction, probability (% chance), and model accuracy, suggestions and depth analysis
 - Fully professional and clean design
