@@ -2,7 +2,7 @@ import os
 import joblib
 import pandas as pd
 from flask import Flask, render_template, request
-from tabpfn import TabPFNClassifier  # TabPFN API
+from tabpfn import TabPFNClassifier  
 
 app = Flask(__name__)
 
@@ -18,9 +18,9 @@ dt_model = joblib.load(DT_MODEL_PATH) if os.path.exists(DT_MODEL_PATH) else None
 
 # Metadata 
 MODEL_META = {
-    "TabPFN": {"accuracy": "92%"},
-    "RandomForest": {"accuracy": "90%"}, 
-    "DecisionTree": {"accuracy": "85%"}   
+    "TabPFN": {"accuracy": "98.01%"},
+    "RandomForest": {"accuracy": "98.10%"}, 
+    "DecisionTree": {"accuracy": "92.33%"}   
 }
 
 
