@@ -22,7 +22,7 @@ Users can provide their health information through a **user-friendly web form**,
 
 ## Dataset Used
 
-- The dataset contains 19 factors related to heart health:
+- The dataset contains 20 factors related to heart health:
 
 - HeartDiseaseorAttack, HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, Diabetes, PhysActivity, Fruits, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, PhysHlth, DiffWalk, Sex, Age
 
@@ -36,8 +36,10 @@ PhysHlth > 10 days → 1, else 0
 ## Machine Learning (ML) Model Used
 
 - TabPFN (Tabular Prior-data Fitted Network)
+- Random Forest Classifier
+- Tree Decision Classifier
 
-- Accuracy: Approx. 85% (can vary depending on dataset and preprocessing)
+- Accuracy: Approx. 98% (can vary depending on dataset size)
 
 ## Technologies Used
 
@@ -47,8 +49,11 @@ PhysHlth > 10 days → 1, else 0
 - pandas
 - numpy
 - matplotlib
-- tabpfn-client
-- HTML/CSS
+- pytorch
+- HTML
+- CSS
+- Javascript
+- JSON
 
 ## License
 
