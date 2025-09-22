@@ -144,11 +144,19 @@ for name, model in models.items():
     plt.savefig(roc_path)
     plt.close()
 
-    # 3) PCA Scatter (using y_pred instead of true labels)
+    # 3) PCA Scatter (aligned with X_test and y_pred)
     pca = PCA(n_components=2)
-    X_pca = pca.fit_transform(X_scaled)
+    X_test_scaled = scaler.transform(X_test)
+    X_pca = pca.fit_transform(X_test_scaled)
+
     plt.figure(figsize=(7, 6))
-    sns.scatterplot(x=X_pca[:, 0], y=X_pca[:, 1], hue=y_pred, palette="Set1", alpha=0.7)
+    sns.scatterplot(
+        x=X_pca[:, 0], 
+        y=X_pca[:, 1], 
+        hue=y_pred, 
+        palette="Set1", 
+        alpha=0.7
+    )
     plt.title(f"{name} PCA Scatter")
     plt.xlabel("PC1")
     plt.ylabel("PC2")
