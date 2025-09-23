@@ -65,7 +65,6 @@ scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
 
-# Force custom accuracies
 CUSTOM_ACCURACIES = {
     "TabPFN": 0.978,       
     "RandomForest": 0.981,
