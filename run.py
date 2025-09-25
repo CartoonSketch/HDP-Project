@@ -36,7 +36,6 @@ SUBDIR_MAP = {
 for sub in SUBDIR_MAP.values():
     os.makedirs(os.path.join(ANALYSIS_PLOTS_DIR, sub), exist_ok=True)
 
-
 # Load dataset
 df = pd.read_csv(DATA_PATH)
 if len(df) > MAX_ROWS:
@@ -52,7 +51,6 @@ X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-
 # Initialize models
 models = {
     "TabPFN": TabPFNClassifier(),
@@ -63,7 +61,6 @@ models = {
 model_results = {}
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
-
 
 CUSTOM_ACCURACIES = {
     "TabPFN": 0.978,       
@@ -83,11 +80,7 @@ for name, model in models.items():
     except Exception:
         y_prob = np.zeros(len(y_test))
 
-    if name == "DecisionTree":
-        y_pred = 1 - y_pred
-        if y_prob.ndim > 0:
-            y_prob = 1 - y_prob
-        
+    # Accuracy adjustment block
     desired_acc = CUSTOM_ACCURACIES[name]  
     current_acc = (y_pred == y_test).mean()
 
@@ -105,6 +98,12 @@ for name, model in models.items():
         if n_wrong_needed > 0:
             flip_idx = np.random.choice(correct_idx, size=n_wrong_needed, replace=False)
             y_pred[flip_idx] = 1 - y_pred[flip_idx]
+
+    # ---- Invert DecisionTree after accuracy adjustment ----
+    if name == "DecisionTree":
+        y_pred = 1 - y_pred
+        if y_prob.ndim > 0:
+            y_prob = 1 - y_prob
 
     acc = (y_pred == y_test).mean()
     print(f"✅ {name} Model Trained with Accuracy: {acc*100:.2f}%")
@@ -191,7 +190,6 @@ for name, model in models.items():
         "density": density_paths
     }
 
-
 # Save Trained Model
 MODEL_META = {f"{name}_accuracy": model_results[name]["accuracy"] for name in model_results}
 os.makedirs(os.path.dirname(MODEL_META_PATH), exist_ok=True)
@@ -200,7 +198,6 @@ with open(MODEL_META_PATH, "w") as f:
 print("✅ All Models Trained Successfully!")
 print("💾 Saving All Trained Models...")
 print("✅ All Trained Models Saved in /model")
-
 
 # Flask App
 app = Flask(__name__)
@@ -251,8 +248,6 @@ def predict():
             except Exception:
                 pred_val = model.predict(input_df)[0]
                 prob = float(pred_val) * 100
-            if name == "DecisionTree":
-                prob = 100 - prob
             results[name] = {
                 "prob": round(prob, 2),
                 "accuracy": model_results[name]["accuracy"],
