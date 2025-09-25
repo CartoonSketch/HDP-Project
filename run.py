@@ -260,7 +260,7 @@ def predict():
                 "roc_curve": model_results[name]["roc_curve"],
                 "pca_scatter": model_results[name]["pca_scatter"],
                 "density": model_results[name]["density"]
-            }
+            }
 
         # Overall prediction 
         prob_main = results["TabPFN"]["prob"]
