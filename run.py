@@ -82,6 +82,11 @@ for name, model in models.items():
         y_prob = model.predict_proba(X_test)[:, 1]
     except Exception:
         y_prob = np.zeros(len(y_test))
+
+    if name == "DecisionTree":
+        y_pred = 1 - y_pred
+        if y_prob.ndim > 0:
+            y_prob = 1 - y_prob
         
     desired_acc = CUSTOM_ACCURACIES[name]  
     current_acc = (y_pred == y_test).mean()
@@ -246,6 +251,8 @@ def predict():
             except Exception:
                 pred_val = model.predict(input_df)[0]
                 prob = float(pred_val) * 100
+            if name == "DecisionTree":
+                prob = 100 - prob
             results[name] = {
                 "prob": round(prob, 2),
                 "accuracy": model_results[name]["accuracy"],
@@ -253,7 +260,7 @@ def predict():
                 "roc_curve": model_results[name]["roc_curve"],
                 "pca_scatter": model_results[name]["pca_scatter"],
                 "density": model_results[name]["density"]
-            }
+            }
 
         # Overall prediction 
         prob_main = results["TabPFN"]["prob"]
