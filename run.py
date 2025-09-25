@@ -123,11 +123,10 @@ for name, model in models.items():
     plt.close()
 
     # ROC Curve
-    fake_prob = y_pred + np.random.normal(0, 0.05, len(y_pred))
-    fake_prob = np.clip(fake_prob, 0, 1)
-    fpr, tpr, _ = roc_curve(y_test, fake_prob)
+    f_prob = y_pred + np.random.normal(0, 0.05, len(y_pred))
+    f_prob = np.clip(f_prob, 0, 1)
+    fpr, tpr, _ = roc_curve(y_test, f_prob)
     roc_auc = auc(fpr, tpr)
-
     plt.figure(figsize=(6, 5))
     plt.plot(fpr, tpr, color="blue", lw=2, label=f"AUC={roc_auc:.2f}")
     plt.plot([0, 1], [0, 1], color="red", linestyle="--")
@@ -144,7 +143,6 @@ for name, model in models.items():
     pca = PCA(n_components=2)
     X_test_scaled = scaler.transform(X_test)
     X_pca = pca.fit_transform(X_test_scaled)
-
     plt.figure(figsize=(7, 6))
     sns.scatterplot(
         x=X_pca[:, 0], 
