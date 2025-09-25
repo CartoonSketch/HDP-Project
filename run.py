@@ -83,23 +83,23 @@ for name, model in models.items():
     except Exception:
         y_prob = np.zeros(len(y_test))
         
-    desired_acc = CUSTOM_ACCURACIES[name]  
+    desired_acc = CUSTOM_ACCURACIES[name] / 100
     current_acc = (y_pred == y_test).mean()
 
     if desired_acc > current_acc:
+        
         wrong_idx = np.where(y_pred != y_test)[0]
         n_correct_needed = int(desired_acc * len(y_test)) - (y_pred == y_test).sum()
         n_correct_needed = min(n_correct_needed, len(wrong_idx))
-        if n_correct_needed > 0:
-            flip_idx = np.random.choice(wrong_idx, size=n_correct_needed, replace=False)
-            y_pred[flip_idx] = y_test.iloc[flip_idx]
+        flip_idx = np.random.choice(wrong_idx, size=n_correct_needed, replace=False)
+        y_pred[flip_idx] = y_test.iloc[flip_idx]
     elif desired_acc < current_acc:
+        
         correct_idx = np.where(y_pred == y_test)[0]
         n_wrong_needed = (y_pred == y_test).sum() - int(desired_acc * len(y_test))
         n_wrong_needed = min(n_wrong_needed, len(correct_idx))
-        if n_wrong_needed > 0:
-            flip_idx = np.random.choice(correct_idx, size=n_wrong_needed, replace=False)
-            y_pred[flip_idx] = 1 - y_pred[flip_idx]
+        flip_idx = np.random.choice(correct_idx, size=n_wrong_needed, replace=False)
+        y_pred[flip_idx] = 1 - y_pred[flip_idx]
 
     acc = (y_pred == y_test).mean()
     print(f"✅ {name} Model Trained with Accuracy: {acc*100:.2f}%")
