@@ -91,7 +91,8 @@
                      {% if data.prob >= 60 %}red
                      {% elif data.prob >= 30 %}orange
                      {% else %}green
-                     {% endif %};">
+                     {% endif %};
+                     color: {% if data.prob < 15 %}black{% else %}white{5 endif %};">
                      {{ data.prob | round(2) }}%
                 </div>
               </div>
