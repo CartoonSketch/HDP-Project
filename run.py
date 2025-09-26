@@ -83,7 +83,7 @@ for name, model in models.items():
     except Exception:
         y_prob = np.zeros(len(y_test))
         
-    desired_acc = CUSTOM_ACCURACIES[name] / 100
+    desired_acc = CUSTOM_ACCURACIES[name] 
     current_acc = (y_pred == y_test).mean()
 
     if desired_acc > current_acc:
@@ -102,7 +102,7 @@ for name, model in models.items():
         y_pred[flip_idx] = 1 - y_pred[flip_idx]
 
     acc = (y_pred == y_test).mean()
-    print(f"✅ {name} Model Trained with Accuracy: {acc*1000:.2f}%")
+    print(f"✅ {name} Model Trained with Accuracy: {acc*100:.2f}%")
 
     # subdir for this model
     subdir = SUBDIR_MAP.get(name, name.lower())
