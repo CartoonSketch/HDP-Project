@@ -127,27 +127,6 @@ for name, model in models.items():
     plt.savefig(cm_path)
     plt.close()
 
-    # 2) ROC curve 
-    display_prob = y_pred_display.astype(float) + np.random.normal(0, 0.05, size=len(y_pred_display))
-    display_prob = np.clip(display_prob, 0.0, 1.0)
-    try:
-        fpr, tpr, _ = roc_curve(y_test, display_prob)
-        roc_auc = auc(fpr, tpr)
-    except Exception:
-        fpr, tpr, roc_auc = [0, 1], [0, 1], 0.0
-
-    plt.figure(figsize=(6, 5))
-    plt.plot(fpr, tpr, lw=2, label=f"AUC={roc_auc:.2f}")
-    plt.plot([0, 1], [0, 1], linestyle="--", color="red")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title(f"{name} ROC Curve")
-    plt.legend(loc="lower right")
-    roc_path = os.path.join(plot_dir, "roc_curve.png")
-    plt.tight_layout()
-    plt.savefig(roc_path)
-    plt.close()
-
     # 3) PCA scatter 
     pca = PCA(n_components=2)
     X_test_scaled = scaler.transform(X_test)
