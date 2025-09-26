@@ -66,7 +66,7 @@ X_scaled = scaler.fit_transform(X)
 FORCE_DISPLAY_ACCURACY = {
     "TabPFN": 0.978,       
     "RandomForest": 0.981,
-    "DecisionTree": 0.871
+    "DecisionTree": 0.923
 }
 
 # Train each model & generate plots
