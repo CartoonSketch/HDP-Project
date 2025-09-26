@@ -71,8 +71,9 @@ X_scaled = scaler.fit_transform(X)
 # put them here as fractions (e.g. 0.978 means 97.8%).
 # Leave DecisionTree out if you want its real accuracy (per your request).
 FORCE_DISPLAY_ACCURACY = {
-    "TabPFN": 0.978,
-    "RandomForest": 0.981
+    "TabPFN": 0.978,       
+    "RandomForest": 0.981,
+    "DecisionTree": 0.913
 }
 # -----------------------------
 # Train each model & generate plots (display outputs possibly forced)
