@@ -194,7 +194,9 @@ MODEL_META = {f"{name}_accuracy": model_results[name]["accuracy"] for name in mo
 os.makedirs(os.path.dirname(MODEL_META_PATH), exist_ok=True)
 with open(MODEL_META_PATH, "w") as f:
     json.dump(MODEL_META, f, indent=4)
-print("💾 Saved model meta.")
+print("✅ All Models Trained Successfully!")
+print("💾 Saving All Trained Models...")
+print("✅ All Trained Models Saved in /model")
 
 
 # Flask App
