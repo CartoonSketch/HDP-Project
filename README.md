@@ -53,11 +53,5 @@ Users can provide their health information through a **user-friendly web form**,
 
 This project is licensed under the MIT License.
 
-## Contributors
-
-- Arnav Sharma (Team Lead)
-- Akash Pandit (Team Co Lead)
-- Sanjay Reddy (Team Member)
-- Atharv Gupta (Team Member)
-- Abhishek Mishra (Team Member)
-- Shaurya Shukla (Team Member)
+## Founder
+- Akash Pandit
