@@ -16,7 +16,7 @@ DT_MODEL_PATH = "model/decision_tree.pkl"
 rf_model = joblib.load(RF_MODEL_PATH) if os.path.exists(RF_MODEL_PATH) else None
 dt_model = joblib.load(DT_MODEL_PATH) if os.path.exists(DT_MODEL_PATH) else None
 
-# Metadata 
+# Metadata if you want to use, for example:
 MODEL_META = {
     "TabPFN": {"accuracy": "98.01%"},
     "RandomForest": {"accuracy": "98.10%"}, 
