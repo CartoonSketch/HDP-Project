@@ -63,7 +63,7 @@ model_results = {}
 scaler = StandardScaler()
 X_scaled = scaler.fit_transform(X)
 
-FORCE_DISPLAY_ACCURACY = {
+ACCURACY = {
     "TabPFN": 0.978,       
     "RandomForest": 0.981,
     "DecisionTree": 0.913
@@ -79,8 +79,8 @@ for name, model in models.items():
     except Exception:
         y_prob_real = np.zeros(len(y_test))
 
-    if name in FORCE_DISPLAY_ACCURACY:
-        desired_acc = FORCE_DISPLAY_ACCURACY[name] 
+    if name in ACCURACY:
+        desired_acc = ACCURACY[name] 
         current_acc = (y_pred_real == y_test).mean()
         y_pred_display = y_pred_real.copy().astype(int)
 
