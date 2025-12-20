@@ -53,5 +53,5 @@ Users can provide their health information through a **user-friendly web form**,
 
 This project is licensed under the MIT License.
 
-## Founder
+## Dev
 - Akash Pandit
